@@ -1,0 +1,45 @@
+/*Scrollbar.css | Differents scrollbars styles */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #404040 #1a1a1a;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #404040;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #525252;
+}
+
+body {
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+}
+
+.horizontal-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+@media (max-width: 768px) {
+  * {
+    scrollbar-width: none;
+  }
+  
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}

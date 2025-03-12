@@ -1,0 +1,209 @@
+/*Night.css | Night mode */
+
+.night-sky {
+  background: linear-gradient(180deg, #050508 0%, #0a0a14 100%);
+  min-height: 100vh;
+  width: 100%;
+}
+
+.stars-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  background-color: #ffffff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: twinkle var(--twinkle-duration) ease-in-out infinite;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.shooting-star {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.shooting-star-dot {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+}
+
+.shooting-star-trail {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.8) 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform-origin: left center;
+}
+
+
+.night-sky h1.name {
+    color: #d0d5ff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    position: relative;
+    z-index: 2;
+    font-weight: 700;
+}
+
+.night-sky .lead {
+    color: #d0d5ff;
+    position: relative;
+    z-index: 2;
+    font-weight: 500;
+  }
+
+.night-sky p, 
+.night-sky .slackmessage {
+  color: #a0a8cc;
+}
+
+.night-sky .subtitle {
+  color: #8890a3;
+}
+
+.night-sky .list-card .exp {
+    color: #6BA5E7;
+}
+
+.night-sky .list-card h3 {
+    color: #ffffff;
+}
+
+.night-sky .list-card div p,
+.night-sky .list-card a,
+.night-sky .list-card ul,
+.night-sky .list-card ol {
+  color: #8890a3;
+}
+
+.night-sky .list-card.example,
+.night-sky .card,
+.night-sky .quiz-card,
+.night-sky .certificate-section {
+  background: linear-gradient(
+    135deg,
+    rgba(28, 31, 44, 0.85) 0%,
+    rgba(20, 22, 35, 0.9) 100%
+  );
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+              inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.night-sky .card-active, 
+.night-sky .card:hover {
+  background-color: rgba(10, 10, 20, 0.8);
+}
+
+.night-sky footer {
+    background: linear-gradient(
+      180deg,
+      rgba(28, 31, 44, 0.98) 0%,
+      rgba(20, 22, 35, 0.98) 45%
+    );
+    position: relative;
+    z-index: 2;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+.night-sky .certificate-section {
+  background-color: rgba(5, 5, 10, 0.7);
+}
+
+.night-sky .radio-label:hover {
+  background-color: rgba(10, 10, 20, 0.8);
+}
+
+
+.night-sky .console-toggle {
+    background: linear-gradient(
+        135deg,
+        rgba(28, 31, 44, 0.85) 0%,
+        rgba(20, 22, 35, 0.9) 100%
+      );
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.night-sky .quiz-container summary::after {
+    color: #6BA5E7;
+}
+
+.night-sky .radio-input:checked {
+    border-color: #6BA5E7;
+}
+
+.night-sky .radio-input:checked::after {
+    background-color: #6BA5E7;
+}
+
+.night-sky .submit-button:hover {
+    background-color: #283593;
+}
+
+.night-sky .certificate-section input[type="text"]:focus {
+    border-color: #6BA5E7;
+}
+
+.night-sky .certificate-section button {
+    background-color: #6BA5E7;
+}
+
+.night-sky .certificate-section button:hover {
+    background-color: #283593;
+}
+
+.night-sky .submit-button {
+    background-color: #6BA5E7;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+  100% { opacity: 0; transform: scale(1); }
+}
+
+@media (max-width: 768px) {
+  .night-sky .list-card.example,
+  .night-sky .card,
+  .night-sky .certificate-section,
+  .night-sky .sections {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .night-sky .lead {
+    font-size: inherit;
+  }
+
+  .night-sky p {
+    font-size: inherit;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .star, .shooting-star {
+    animation: none;
+  }
+}
