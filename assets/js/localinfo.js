@@ -33,7 +33,7 @@ async function getIpInfo() {
             }
             if (isp) {
                 ispUpdate.innerHTML = isp;
-                ispfUpdate.innerHTML = isp;
+                ispfUpdate.innerHTML = isp.toUpperCase();
                 log(`isp(f)Update set to ${isp}`, 'success');
                 
             }
