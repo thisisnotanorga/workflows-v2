@@ -32,7 +32,7 @@ $stmt->bind_param("sds", $name, $percentage, $ip);
 $stmt->execute();
 $stmt->close();
 
-$svgPath = '../../assets/img/template.svg';
+$svgPath = '../../assets/img/certificate.svg';
 if (!file_exists($svgPath)) {
     die('Error: SVG file not found.');
 }
