@@ -15,7 +15,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 $userAgent = $_SERVER['HTTP_USER_AGENT'];
 $currentTime = time();
 
-$mysqli = new mysqli('localhost', 'isaweb_shit', 'DZL)V&4+^Ytne+d6', 'isaweb_shit');
+$mysqli = new mysqli('dbhost', 'dbuser', 'dbpwd', 'dbname');
 
 if ($mysqli->connect_error) {
     die('Connection failed: ' . $mysqli->connect_error);
