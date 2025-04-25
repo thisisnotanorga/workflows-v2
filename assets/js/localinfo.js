@@ -14,7 +14,7 @@ log(`dateUpdate set to ${dateUpdate.innerHTML}`, 'success');
 //Get informations abt the ip
 async function getIpInfo() {
     try {
-        const response = await fetch('https://ip.douxx.tech');
+        const response = await fetch('/api/ip/');
         const data = await response.json();
     
         if (data.status === 'success') {
