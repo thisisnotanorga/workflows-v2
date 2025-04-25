@@ -1,4 +1,51 @@
 <?php
+/*
+To migrate from a database that still uses an old api, run those sql commands:
+---------------------------------
+
+ALTER TABLE cert ADD COLUMN IF NOT EXISTS user_id INT(11) AFTER ip;
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    ip VARCHAR(45) NOT NULL,
+    user_agent TEXT NOT NULL,
+    status ENUM('safe', 'warn', 'ban') NOT NULL DEFAULT 'safe',
+    warn_time DATETIME NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_user (ip, user_agent(255))
+);
+
+INSERT IGNORE INTO users (ip, user_agent, status)
+SELECT DISTINCT c.ip, 'Unknown', 'safe'
+FROM cert c;
+
+UPDATE cert c
+JOIN users u ON c.ip = u.ip
+SET c.user_id = u.id
+WHERE c.user_id IS NULL;
+
+CREATE TABLE IF NOT EXISTS requests (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    user_id INT(11) NOT NULL,
+    request_time DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS warnings (
+    id INT(11) AUTO_INCREMENT PRIMARY KEY,
+    user_id INT(11) NOT NULL,
+    reason VARCHAR(255) NOT NULL,
+    warning_time DATETIME NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+CREATE INDEX idx_request_time ON requests (user_id, request_time);
+CREATE INDEX idx_warning_time ON warnings (user_id, warning_time);
+ALTER TABLE cert ADD CONSTRAINT fk_cert_user FOREIGN KEY (user_id) REFERENCES users(id);
+
+*/
+
 define('MIN_PERCENTAGE', 80);
 define('MAX_PERCENTAGE', 100);
 define('MAX_REQUESTS_PER_MINUTE', 3);
