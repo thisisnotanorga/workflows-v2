@@ -103,7 +103,3 @@ function resetPage() {
         log('all el are back, sadly :[', 'success');
     }
 }
-
-// Exemple d'utilisation:
-// makeElementsFall('assets/imgs/your-reveal-image.jpg');
-// Pour restaurer: resetPage();
