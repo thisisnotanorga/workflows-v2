@@ -31,6 +31,7 @@ class ScriptLoader {
             'assets/js/certif.js',
             'assets/js/cheat.js',
             'assets/js/console.js',
+            'assets/js/cookies.js',
             'assets/js/cursor.js',
             'assets/js/hacker.js',
             'assets/js/localinfo.js',
