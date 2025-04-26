@@ -33,6 +33,7 @@ class ScriptLoader {
             'assets/js/console.js',
             'assets/js/cookies.js',
             'assets/js/cursor.js',
+            'assets/js/downfall.js',
             'assets/js/hacker.js',
             'assets/js/localinfo.js',
             'assets/js/minecraft.js',
