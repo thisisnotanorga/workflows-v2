@@ -1,4 +1,5 @@
-//cookies.js
+//Loader.js | Create custom meme cookies
+
 function createCustomCookies(cookiesData, prefix = '', forceUpdate = false) {
     if (!cookiesData || typeof cookiesData !== 'object') {
         log('Cookie data must be provided as an object', 'error');
