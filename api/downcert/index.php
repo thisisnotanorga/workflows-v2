@@ -12,8 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
     user_agent TEXT NOT NULL,
     status ENUM('safe', 'warn', 'ban') NOT NULL DEFAULT 'safe',
     warn_time DATETIME NULL,
-    created_at TIMESTAMP DEFAULT UTC_TIMESTAMP(),
-    updated_at TIMESTAMP DEFAULT UTC_TIMESTAMP() ON UPDATE UTC_TIMESTAMP(),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP (),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP () ON UPDATE CURRENT_TIMESTAMP (),
     UNIQUE KEY unique_user (ip, user_agent(255))
 );
 
@@ -262,20 +262,55 @@ function generateVerificationKey($name, $timestamp) {
     return $randomChars . '|' . $certBasedChars . '|' . $timeBasedChars; // '|' to EXPLODEEE them later
 }
 
+
+function createTextChunk($keyword, $text) {
+    $data = $keyword . "\0" . $text;
+    $length = pack('N', strlen($data));
+    $chunkType = 'tEXt';
+    $crc = pack('N', crc32($chunkType . $data));
+    return $length . $chunkType . $data . $crc;
+}
+
 function appendVerificationKeyToPng($pngPath, $verificationKey) {
-    $keyParts = explode('|', $verificationKey); //BOOOOOMMMMMMMM
-    
-    $verificationText = "\n-----BEGIN NOSKID KEY-----\n";
+    $keyParts = explode('|', $verificationKey);
+
+    $verificationText = "-----BEGIN NOSKID KEY-----\n";
     $verificationText .= $keyParts[0] . "\n";
     $verificationText .= $keyParts[1] . "\n";
     $verificationText .= $keyParts[2] . "\n";
-    $verificationText .= "-----END NOSKID KEY-----\n";
-    
-    $file = fopen($pngPath, 'ab');
-    if ($file) {
-        fwrite($file, $verificationText);
-        fclose($file);
+    $verificationText .= "-----END NOSKID KEY-----";
+
+    $pngData = file_get_contents($pngPath);
+
+    if (substr($pngData, 0, 8) !== "\x89PNG\x0D\x0A\x1A\x0A") {
+        throw new Exception("Not a valid PNG file.");
     }
+
+    $pos = 8; //skip headers (png)
+    $chunks = [];
+
+    //parse chunks
+    while ($pos < strlen($pngData)) {
+        $length = unpack('N', substr($pngData, $pos, 4))[1];
+        $type = substr($pngData, $pos + 4, 4);
+        $data = substr($pngData, $pos + 8, $length);
+        $crc = substr($pngData, $pos + 8 + $length, 4);
+
+        if ($type === 'IEND') {
+            //inserting before the iend
+            $textChunk = createTextChunk('noskid-key', $verificationText);
+            $chunks[] = $textChunk;
+        }
+
+        // add the chunk
+        $chunk = substr($pngData, $pos, 12 + $length);
+        $chunks[] = $chunk;
+
+        $pos += 12 + $length;
+    }
+
+    $newData = substr($pngData, 0, 8) . implode('', $chunks);
+    file_put_contents($pngPath, $newData);
 }
 
 function setupDatabase($mysqli) {
