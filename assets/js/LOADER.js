@@ -30,6 +30,7 @@ class ScriptLoader {
             'assets/js/boom.js',
             'assets/js/certif.js',
             'assets/js/cheat.js',
+            'assets/js/check.js',
             'assets/js/console.js',
             'assets/js/cookies.js',
             'assets/js/cursor.js',

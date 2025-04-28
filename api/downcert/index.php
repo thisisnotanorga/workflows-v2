@@ -4,6 +4,7 @@ To migrate from a database that still uses an old api, run those sql commands:
 ---------------------------------
 
 ALTER TABLE cert ADD COLUMN IF NOT EXISTS user_id INT(11) AFTER ip;
+ALTER TABLE cert ADD COLUMN IF NOT EXISTS verification_key VARCHAR(255) AFTER user_id;
 
 CREATE TABLE IF NOT EXISTS users (
     id INT(11) AUTO_INCREMENT PRIMARY KEY,
@@ -11,8 +12,8 @@ CREATE TABLE IF NOT EXISTS users (
     user_agent TEXT NOT NULL,
     status ENUM('safe', 'warn', 'ban') NOT NULL DEFAULT 'safe',
     warn_time DATETIME NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT UTC_TIMESTAMP(),
+    updated_at TIMESTAMP DEFAULT UTC_TIMESTAMP() ON UPDATE UTC_TIMESTAMP(),
     UNIQUE KEY unique_user (ip, user_agent(255))
 );
 
@@ -50,7 +51,13 @@ define('MIN_PERCENTAGE', 80);
 define('MAX_PERCENTAGE', 100);
 define('MAX_REQUESTS_PER_MINUTE', 3);
 define('WARNING_TIMEOUT', 300); // seconds btw
-define('DISCORD_WEBHOOK_URL', 'WBK_URL');
+define('DISCORD_WEBHOOK_URL', 'https://discord.com/api/webhooks/1365426021914120212/qmWbrGtyk_nZL3drfqaap0K42EYGlIXWy_3XGu9UYaxaETBZ4x25TKkTZSTru-6J3E8D');
+define('DB_HOST', 'dbhost');
+define('DB_USER', 'dbuser');
+define('DB_PASS', 'dbpwd');
+define('DB_NAME', 'dbname');
+
+date_default_timezone_set('UTC');
 
 if (!isset($_GET['percentage']) || !isset($_GET['name'])) {
     die('Error: Missing parameters "percentage" or "name".');
@@ -62,7 +69,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 $userAgent = $_SERVER['HTTP_USER_AGENT'];
 $currentTime = time();
 
-$mysqli = new mysqli('dbhost', 'dbuser', 'dbpwd', 'dbname');
+$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
 
 if ($mysqli->connect_error) {
     die('Connection failed: ' . $mysqli->connect_error);
@@ -95,7 +102,7 @@ if ($userStatus === 'ban') {
     die('Access forbidden');
 }
 
-$oneMinuteAgo = date('Y-m-d H:i:s', $currentTime - 60);
+$oneMinuteAgo = gmdate('Y-m-d H:i:s', $currentTime - 60);
 $stmt = $mysqli->prepare("SELECT COUNT(*) AS request_count FROM requests WHERE user_id = ? AND request_time > ?");
 $stmt->bind_param("is", $userId, $oneMinuteAgo);
 $stmt->execute();
@@ -103,7 +110,7 @@ $result = $stmt->get_result();
 $requestCount = $result->fetch_assoc()['request_count'];
 $stmt->close();
 
-$stmt = $mysqli->prepare("INSERT INTO requests (user_id, request_time) VALUES (?, NOW())");
+$stmt = $mysqli->prepare("INSERT INTO requests (user_id, request_time) VALUES (?, UTC_TIMESTAMP())");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 $stmt->close();
@@ -141,7 +148,7 @@ if ($shouldBan) {
     $stmt->execute();
     $stmt->close();
 
-    $stmt = $mysqli->prepare("INSERT INTO warnings (user_id, reason, warning_time) VALUES (?, ?, NOW())");
+    $stmt = $mysqli->prepare("INSERT INTO warnings (user_id, reason, warning_time) VALUES (?, ?, UTC_TIMESTAMP())");
     $stmt->bind_param("is", $userId, $actionReason);
     $stmt->execute();
     $stmt->close();
@@ -153,12 +160,12 @@ if ($shouldBan) {
 }
 
 if ($shouldWarn) {
-    $stmt = $mysqli->prepare("UPDATE users SET status = 'warn', warn_time = NOW() WHERE id = ?");
+    $stmt = $mysqli->prepare("UPDATE users SET status = 'warn', warn_time = UTC_TIMESTAMP() WHERE id = ?");
     $stmt->bind_param("i", $userId);
     $stmt->execute();
     $stmt->close();
 
-    $stmt = $mysqli->prepare("INSERT INTO warnings (user_id, reason, warning_time) VALUES (?, ?, NOW())");
+    $stmt = $mysqli->prepare("INSERT INTO warnings (user_id, reason, warning_time) VALUES (?, ?, UTC_TIMESTAMP())");
     $stmt->bind_param("is", $userId, $actionReason);
     $stmt->execute();
     $stmt->close();
@@ -183,8 +190,10 @@ if ($userStatus === 'warn' && $warnTime > 0 && ($currentTime - $warnTime) > WARN
     $userStatus = 'safe';
 }
 
-$stmt = $mysqli->prepare("INSERT INTO cert (name, percentage, ip, user_id) VALUES (?, ?, ?, ?)");
-$stmt->bind_param("sdsi", $name, $percentage, $ip, $userId);
+$verificationKey = generateVerificationKey($name, $currentTime);
+
+$stmt = $mysqli->prepare("INSERT INTO cert (name, percentage, ip, user_id, verification_key) VALUES (?, ?, ?, ?, ?)");
+$stmt->bind_param("sdsis", $name, $percentage, $ip, $userId, $verificationKey);
 $stmt->execute();
 $insertId = $mysqli->insert_id;
 $stmt->close();
@@ -196,7 +205,7 @@ if (!file_exists($svgPath)) {
 
 $svgContent = file_get_contents($svgPath);
 
-$date = date('Y-m-d');
+$date = gmdate('Y-m-d');
 $certNumber = str_pad($insertId, 5, '0', STR_PAD_LEFT);
 $svgContent = str_replace(['{{DATE}}', '{{CERTNB}}', '{{PERCENT}}', '{{USER}}'], [$date, $certNumber, $percentage, $name], $svgContent);
 
@@ -210,6 +219,8 @@ exec($command, $output, $return_var);
 if ($return_var !== 0) {
     die('Error converting SVG to PNG: ' . implode("\n", $output));
 }
+
+appendVerificationKeyToPng($pngPath, $verificationKey);
 
 $ipApiUrl = "http://ip-api.com/json/{$ip}?fields=countryCode";
 $ipApiResponse = @file_get_contents($ipApiUrl);
@@ -229,6 +240,44 @@ unlink($pngPath);
 
 $mysqli->close();
 
+function generateVerificationKey($name, $timestamp) {
+    $randomChars = bin2hex(random_bytes(32)); //first line: some random b16 chars
+    
+    global $mysqli;
+    $result = $mysqli->query("SELECT AUTO_INCREMENT FROM information_schema.TABLES WHERE TABLE_SCHEMA = '" . DB_NAME . "' AND TABLE_NAME = 'cert'");
+    $row = $result->fetch_assoc();
+    $nextId = $row['AUTO_INCREMENT'];
+    
+    $certNumberData = "CERT-" . str_pad($nextId, 5, '0', STR_PAD_LEFT) . "-" . $name;
+    $certBasedChars = base64_encode($certNumberData);
+    $certBasedChars = str_pad($certBasedChars, 64, '=', STR_PAD_RIGHT);
+    $certBasedChars = substr($certBasedChars, 0, 64); //second line: cert number && cert owner
+    
+    $dateTime = gmdate('Y-m-d H:i:s', $timestamp);
+    $timeData = "CREATED-" . $dateTime; //third line: creation date
+    $timeBasedChars = base64_encode($timeData);
+    $timeBasedChars = str_pad($timeBasedChars, 64, '=', STR_PAD_RIGHT);
+    $timeBasedChars = substr($timeBasedChars, 0, 64);
+    
+    return $randomChars . '|' . $certBasedChars . '|' . $timeBasedChars; // '|' to EXPLODEEE them later
+}
+
+function appendVerificationKeyToPng($pngPath, $verificationKey) {
+    $keyParts = explode('|', $verificationKey); //BOOOOOMMMMMMMM
+    
+    $verificationText = "\n-----BEGIN NOSKID KEY-----\n";
+    $verificationText .= $keyParts[0] . "\n";
+    $verificationText .= $keyParts[1] . "\n";
+    $verificationText .= $keyParts[2] . "\n";
+    $verificationText .= "-----END NOSKID KEY-----\n";
+    
+    $file = fopen($pngPath, 'ab');
+    if ($file) {
+        fwrite($file, $verificationText);
+        fclose($file);
+    }
+}
+
 function setupDatabase($mysqli) {
     $usersTableExists = $mysqli->query("SHOW TABLES LIKE 'users'")->num_rows > 0;
     if (!$usersTableExists) {
@@ -238,8 +287,8 @@ function setupDatabase($mysqli) {
             user_agent TEXT NOT NULL,
             status ENUM('safe', 'warn', 'ban') NOT NULL DEFAULT 'safe',
             warn_time DATETIME NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            created_at TIMESTAMP DEFAULT UTC_TIMESTAMP(),
+            updated_at TIMESTAMP DEFAULT UTC_TIMESTAMP() ON UPDATE UTC_TIMESTAMP(),
             UNIQUE KEY unique_user (ip, user_agent(255))
         )";
         if (!$mysqli->query($createUsersTableSql)) {
@@ -284,14 +333,20 @@ function setupDatabase($mysqli) {
             percentage DECIMAL(5,2) NOT NULL,
             ip VARCHAR(45) NOT NULL,
             user_id INT(11) NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            verification_key VARCHAR(255) NOT NULL,
+            created_at TIMESTAMP DEFAULT UTC_TIMESTAMP(),
             FOREIGN KEY (user_id) REFERENCES users(id)
         )";
         if (!$mysqli->query($createTableSql)) {
             die('Error creating cert table: ' . $mysqli->error);
         }
-    } elseif (!$mysqli->query("SHOW COLUMNS FROM cert LIKE 'user_id'")->num_rows) {
-        $mysqli->query("ALTER TABLE cert ADD COLUMN user_id INT(11) AFTER ip");
+    } else {
+        if (!$mysqli->query("SHOW COLUMNS FROM cert LIKE 'user_id'")->num_rows) {
+            $mysqli->query("ALTER TABLE cert ADD COLUMN user_id INT(11) AFTER ip");
+        }
+        if (!$mysqli->query("SHOW COLUMNS FROM cert LIKE 'verification_key'")->num_rows) {
+            $mysqli->query("ALTER TABLE cert ADD COLUMN verification_key VARCHAR(255) AFTER user_id");
+        }
     }
 }
 
@@ -347,7 +402,7 @@ function sendDiscordNotification($certNumber, $username, $countryEmoji, $userSta
                         'inline' => true
                     ]
                 ],
-                'timestamp' => date('c')
+                'timestamp' => gmdate('c')
             ]
         ]
     ];
@@ -421,7 +476,7 @@ function sendDiscordWarningNotification($username, $ip, $userAgent, $reason) {
                         'inline' => false
                     ]
                 ],
-                'timestamp' => date('c')
+                'timestamp' => gmdate('c')
             ]
         ]
     ];
@@ -474,7 +529,7 @@ function sendDiscordBanNotification($username, $ip, $userAgent, $reason) {
                         'inline' => false
                     ]
                 ],
-                'timestamp' => date('c')
+                'timestamp' => gmdate('c')
             ]
         ]
     ];

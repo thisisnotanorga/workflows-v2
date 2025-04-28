@@ -30,6 +30,11 @@ const keyBindings = [
         keys: ['Shift', 'N'],
         action: toggleNightMode,
         description: 'Toggle night sky'
+    },
+    {
+        keys: ['Shift', 'C'],
+        action: verifyCertificate,
+        description: 'Check a certificate status'
     }
 ];
 
@@ -85,6 +90,10 @@ const sequences = {
     'upfall': {
         action: resetPage,
         description: 'Makes all the elements of the website come back'
+    },
+    'check': {
+        action: verifyCertificate,
+        description: 'Check if a certificate is valid and get informations about it'
     }
 };
 
