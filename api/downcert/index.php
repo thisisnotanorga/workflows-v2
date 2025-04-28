@@ -51,7 +51,7 @@ define('MIN_PERCENTAGE', 80);
 define('MAX_PERCENTAGE', 100);
 define('MAX_REQUESTS_PER_MINUTE', 3);
 define('WARNING_TIMEOUT', 300); // seconds btw
-define('DISCORD_WEBHOOK_URL', 'https://discord.com/api/webhooks/1365426021914120212/qmWbrGtyk_nZL3drfqaap0K42EYGlIXWy_3XGu9UYaxaETBZ4x25TKkTZSTru-6J3E8D');
+define('DISCORD_WEBHOOK_URL', 'WBK_URL');
 define('DB_HOST', 'dbhost');
 define('DB_USER', 'dbuser');
 define('DB_PASS', 'dbpwd');
