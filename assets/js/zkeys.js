@@ -35,6 +35,11 @@ const keyBindings = [
         keys: ['Shift', 'C'],
         action: verifyCertificate,
         description: 'Check a certificate status'
+    },
+    {
+        keys: ['Shift', 'E'],
+        action: showFakeExploitScreen,
+        description: 'Runs the best exploit ever created'
     }
 ];
 
