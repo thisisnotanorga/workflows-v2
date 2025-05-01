@@ -1,3 +1,6 @@
+//Gary.js | Full screens an image of gary (a cat) > suggestion by @Zach11111 on github 
+
+
 function toggleGary() {
     log('toggleGary function called');
 
