@@ -141,14 +141,25 @@ document.addEventListener('keydown', checkKeyCombination);
 function help() {
     log("", 'warning');
     log("=-=-= Combos =-=-=", 'warning');
-    keyBindings.forEach(binding => {
+    
+    const sortedCombos = [...keyBindings].sort((a, b) => {
+        const aKeys = a.keys.join(' + ');
+        const bKeys = b.keys.join(' + ');
+        return aKeys.localeCompare(bKeys);
+    });
+    
+    sortedCombos.forEach(binding => {
         log(`Combo: ${binding.keys.join(' + ')}: ${binding.description}`, 'warning');
     });
 
     log("=-=-= Sequences =-=-=", 'warning');
-    for (const sequence in sequences) {
+    
+    const sortedSequences = Object.keys(sequences).sort();
+    
+    sortedSequences.forEach(sequence => {
         log(`Sequence: '${sequence}': ${sequences[sequence].description}`, 'warning');
-    }
+    });
+    
     log("", 'warning');
 }
 
