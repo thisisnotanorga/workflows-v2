@@ -94,6 +94,10 @@ const sequences = {
     'check': {
         action: verifyCertificate,
         description: 'Check if a certificate is valid and get informations about it'
+    },
+    'gary': {
+        action: toggleGary,
+        description: 'Shows gary (a cat)'
     }
 };
 

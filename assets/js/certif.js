@@ -269,7 +269,7 @@ function offerCertificate(score) {
       if (username) {
           window.location.href = `api/downcert?percentage=${percentage.toFixed(2)}&name=${encodeURIComponent(username)}`;
           log('Certificate downloaded!', 'success');
-          quizForm.innerHTML = '<p>✅ Certificate downloaded!</p>';
+          quizForm.innerHTML = '<p>✅ Certificate downloaded! Check if a certificate is valid with \'Shift + C\'</p>';
           certificateSection.style.display = 'none';
       } else {
           alert('Please enter a valid name.');
