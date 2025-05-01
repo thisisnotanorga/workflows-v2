@@ -25,7 +25,6 @@ Licensed under the [GPL-3.0 License](LICENSE)
 Created by [douxxtech](https://github.com/douxxtech) <3
 
 > [!NOTE]
-> assets/vids/rick.mp4 is missing at the moment, download it [here](https://noskid.today/assets/vids/rick.mp4)  
 > term/ is missing at the moment, download it [here](https://noskid.today/term.zip)
 
 ^^^^^^  
