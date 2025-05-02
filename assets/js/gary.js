@@ -1,93 +1,44 @@
-//Gary.js | Full screens an image of gary (a cat) > suggestion by @Zach11111 on github 
+//Gary.js | Shows a random image of gary the cat > suggestion by @Zach11111 on github 
 
+function showGary() {
 
-function toggleGary() {
-    log('toggleGary function called');
+    const loadingContent = '<div style="text-align:center;color:white">Gary is so BIG that the image takes time to load</div>';
 
-    let garyEl = document.getElementById('garyFullscreen');
-
-    if (garyEl) {
-        log('Removing existing Gary element');
-        document.body.removeChild(garyEl); // NOOOO GARY
-        return;
-    }
-
-    log('Creating new Gary element');
-    garyEl = document.createElement('div');
-    garyEl.id = 'garyFullscreen';
-    garyEl.style.position = 'fixed';
-    garyEl.style.top = '0';
-    garyEl.style.left = '0';
-    garyEl.style.width = '100%';
-    garyEl.style.height = '100%';
-    garyEl.style.backgroundColor = 'black';
-    garyEl.style.zIndex = '9999';
-    garyEl.style.display = 'flex';
-    garyEl.style.justifyContent = 'center';
-    garyEl.style.alignItems = 'center'; // i love creating css in javascript
-
-    const garyImage = document.createElement('img');
-    garyImage.style.maxWidth = '100%';
-    garyImage.style.maxHeight = '100%';
-    garyImage.style.objectFit = 'contain';
-
-    const loadingText = document.createElement('div');
-    loadingText.textContent = 'gary is so BIG that the image takes time to load';
-    loadingText.style.color = 'white';
-    loadingText.style.fontSize = '24px';
-    garyEl.appendChild(loadingText);
-
-    document.body.appendChild(garyEl); // a new gary is born
-    log('Gary element added to the body');
-
-    document.addEventListener('fullscreenchange', handleFullscreenExit); //when we exit full screen
-    document.addEventListener('webkitfullscreenchange', handleFullscreenExit);
-    document.addEventListener('mozfullscreenchange', handleFullscreenExit); //fuck firefox
-    document.addEventListener('MSFullscreenChange', handleFullscreenExit); //fuck ms
-
-    function handleFullscreenExit() {
-        if (!document.fullscreenElement &&
-            !document.webkitFullscreenElement &&
-            !document.mozFullScreenElement &&
-            !document.msFullscreenElement) {
-            if (document.getElementById('garyFullscreen')) {
-                log('Exiting fullscreen, removing Gary element');
-                document.body.removeChild(document.getElementById('garyFullscreen')); // /kill gary childs
-            }
-
-            document.removeEventListener('fullscreenchange', handleFullscreenExit);
-            document.removeEventListener('webkitfullscreenchange', handleFullscreenExit);
-            document.removeEventListener('mozfullscreenchange', handleFullscreenExit);
-            document.removeEventListener('MSFullscreenChange', handleFullscreenExit);
-        }
-    }
+    const win = ClassicWindow.createWindow({
+      title: 'Gary the Cat',
+      content: loadingContent,
+      width: 500,
+      height: 400,
+      x: Math.round((window.innerWidth - 500) / 2),
+      y: Math.round((window.innerHeight - 400) / 2),
+      statusText: 'Loading gary...'
+    });
 
     fetch('https://api.garythe.cat/gary')
-        .then(response => response.json())
-        .then(data => {
-            log('Gary image fetched successfully');
-            garyEl.removeChild(loadingText);
-            garyEl.appendChild(garyImage);
+      .then(response => response.json())
+      .then(data => {
+        const garyImage = document.createElement('img');
+        garyImage.src = data.url;
+        garyImage.style.maxWidth = '100%';
+        garyImage.style.maxHeight = '100%';
+        garyImage.style.objectFit = 'contain';
+        garyImage.style.display = 'block';
+        garyImage.style.margin = 'auto';
 
-            garyImage.src = data.url;
+        const container = document.createElement('div');
+        container.style.display = 'flex';
+        container.style.justifyContent = 'center';
+        container.style.alignItems = 'center';
+        container.style.height = '100%';
+        container.appendChild(garyImage);
 
-            garyImage.onload = () => {
-                log('Gary image loaded, requesting fullscreen');
-                if (garyEl.requestFullscreen) {
-                    garyEl.requestFullscreen();
-                } else if (garyEl.webkitRequestFullscreen) {
-                    garyEl.webkitRequestFullscreen();
-                } else if (garyEl.mozRequestFullScreen) {
-                    garyEl.mozRequestFullScreen();
-                } else if (garyEl.msRequestFullscreen) {
-                    garyEl.msRequestFullscreen();
-                }
-            };
-        })
-        .catch(error => {
-            log('Failed to show Gary :(((( : ' + error, 'error');
-            if (document.getElementById('garyFullscreen')) {
-                document.body.removeChild(document.getElementById('garyFullscreen')); // /kill gary childs
-            }
-        });
-}
+        ClassicWindow.updateWindowContent(win, container);
+        ClassicWindow.updateStatusText(win, 'Gary is here!');
+        log('Gary is here !', 'success');
+      })
+      .catch(error => {
+        ClassicWindow.updateWindowContent(win, '<div style="color:red;text-align:center">Failed to load Gary :(</div>');
+        ClassicWindow.updateStatusText(win, 'Error: ' + error.message);
+        log('Gary ?... : ' + error.message, 'error');
+      });
+  }

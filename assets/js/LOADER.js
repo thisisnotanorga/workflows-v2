@@ -34,6 +34,7 @@ class ScriptLoader {
             'assets/js/console.js',
             'assets/js/cookies.js',
             'assets/js/cursor.js',
+            'assets/js/cw.js',
             'assets/js/downfall.js',
             'assets/js/exploit.js',
             'assets/js/gary.js',

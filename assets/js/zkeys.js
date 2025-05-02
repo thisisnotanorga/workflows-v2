@@ -101,7 +101,7 @@ const sequences = {
         description: 'Check if a certificate is valid and get informations about it'
     },
     'gary': {
-        action: toggleGary,
+        action: showGary,
         description: 'Shows gary (a cat)'
     }
 };
