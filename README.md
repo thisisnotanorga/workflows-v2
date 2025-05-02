@@ -1,6 +1,6 @@
 # Noskid today - please don't talk when you don't know
 
-![togp thing](https://togp.xyz?owner=douxxtech&repo=noskid.today&theme=json-dark-all)
+![togp thing](https://togp.xyz?owner=douxxtech&repo=noskid.today&theme=json-dark-all&cache=false)
 
 We dont like skids.
 
