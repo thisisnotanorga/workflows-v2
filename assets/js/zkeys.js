@@ -103,6 +103,10 @@ const sequences = {
     'gary': {
         action: showGary,
         description: 'Shows gary (a cat)'
+    },
+    'pong': {
+        action: pongGame,
+        description: 'Play pong !'
     }
 };
 

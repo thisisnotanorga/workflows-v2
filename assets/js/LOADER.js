@@ -43,6 +43,7 @@ class ScriptLoader {
             'assets/js/minecraft.js',
             'assets/js/night.js',
             'assets/js/noskid.js',
+            'assets/js/pong.js',
             'assets/js/rick.js',
             'assets/js/terminal.js',
             'assets/js/track.js',
