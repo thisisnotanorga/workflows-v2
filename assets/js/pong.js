@@ -37,7 +37,7 @@ function pongGame() {
 
     let stopGame = false;
     let animationId;
-    let aiBaseDifficulty = 0.4; // 0 (easy) to 1 (impossible)
+    let aiBaseDifficulty = 0.5; // 0 (easy) to 1 (impossible)
     let aiDifficulty = aiBaseDifficulty;
     let gameOver = false;
 
