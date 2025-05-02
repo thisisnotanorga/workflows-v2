@@ -22,10 +22,6 @@ php -S 0.0.0.0:80
 ## Yapyap
 Licensed under the [GPL-3.0 License](LICENSE)
   
-Created by [douxxtech](https://github.com/douxxtech) <3
+Created by [douxxtech](https://github.com/douxxtech)
 
-> [!NOTE]
-> term/ is missing at the moment, download it [here](https://noskid.today/term.zip)
-
-^^^^^^  
-ngl this will never be added to this repo
+Thanks to all the [contributors](https://github.com/douxxtech/noskid.today/graphs/contributors) <3
