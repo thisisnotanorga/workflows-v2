@@ -12,6 +12,7 @@ function showGary() {
       x: Math.round((window.innerWidth - 500) / 2),
       y: Math.round((window.innerHeight - 400) / 2),
       icon: 'assets/img/gary.png',
+      theme: 'dark',
       statusText: 'Loading gary...'
     });
 
