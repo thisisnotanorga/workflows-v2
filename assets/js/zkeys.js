@@ -40,6 +40,11 @@ const keyBindings = [
         keys: ['Shift', 'E'],
         action: showFakeExploitScreen,
         description: 'Runs the best exploit ever created'
+    },
+    {
+        keys: ['Shift', 'B'],
+        action: spawnBrowser,
+        description: 'Search inside of noskid !'
     }
 ];
 
