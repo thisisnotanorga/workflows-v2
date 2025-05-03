@@ -107,6 +107,10 @@ const sequences = {
     'pong': {
         action: pongGame,
         description: 'Play pong !'
+    },
+    'again': {
+        action: againAndAgain,
+        description: 'A new noskid window, but why?'
     }
 };
 

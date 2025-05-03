@@ -26,6 +26,7 @@ class ScriptLoader {
         this.consoleElement = consoleElement;
         this.scripts = [
             'https://cdn.jsdelivr.net/npm/typed.js@2.0.11',
+            'assets/js/again.js',
             'assets/js/awesome.js',
             'assets/js/boom.js',
             'assets/js/certif.js',
