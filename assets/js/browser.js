@@ -10,6 +10,7 @@ function spawnBrowser(event) {
         x: Math.round((window.innerWidth - 500) / 2),
         y: Math.round((window.innerHeight - 400) / 2),
         theme: 'dark',
+        icon: 'assets/img/ie.svg', //this icon is under MIT licence
         statusText: 'NoSkidBrowser v69',
     });
 
