@@ -17,6 +17,7 @@ function pongGame() {
         x: Math.round((window.innerWidth - 500) / 2),
         y: Math.round((window.innerHeight - 400) / 2),
         statusText: 'Use W/S keys to control your paddle. First to 10 points wins!',
+        icon: 'assets/img/pong.png',
         onClose: () => {
             stopGame = true;
             cancelAnimationFrame(animationId);

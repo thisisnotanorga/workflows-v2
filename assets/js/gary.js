@@ -11,6 +11,7 @@ function showGary() {
       height: 400,
       x: Math.round((window.innerWidth - 500) / 2),
       y: Math.round((window.innerHeight - 400) / 2),
+      icon: 'assets/img/gary.png',
       statusText: 'Loading gary...'
     });
 
