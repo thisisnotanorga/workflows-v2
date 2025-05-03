@@ -1,3 +1,108 @@
 //Cw.js | ClassicWindow, a web window manager
 
+/** (thx lechat for the doc)
+ * ClassicWindow Library
+ *
+ * This script defines a library for creating and managing custom window-like
+ * UI components within a web page. It provides functionality to create,
+ * manipulate, and interact with these windows, mimicking the behavior of
+ * traditional desktop window managers.
+ *
+ * @namespace ClassicWindow
+ */
+
+/**
+ * Initializes the ClassicWindow library by injecting necessary styles into the document.
+ * This function is called automatically when the library is loaded.
+ *
+ * @function
+ * @name initializeStyles
+ * @memberof ClassicWindow
+ * @private
+ */
+
+/**
+ * Creates a container for minimized windows (taskbar) if it doesn't already exist.
+ *
+ * @function
+ * @name ensureTaskbarContainer
+ * @memberof ClassicWindow
+ * @param {number} [x=10] - The horizontal position of the taskbar container.
+ * @param {number} [y=10] - The vertical position of the taskbar container.
+ * @returns {HTMLElement} The taskbar container element.
+ * @private
+ */
+
+/**
+ * Calculates the highest z-index value among all existing windows.
+ *
+ * @function
+ * @name getTopZIndex
+ * @memberof ClassicWindow
+ * @returns {number} The highest z-index value.
+ */
+
+/**
+ * Creates a new window with the specified options.
+ *
+ * @function
+ * @name createWindow
+ * @memberof ClassicWindow
+ * @param {Object} [options={}] - Configuration options for the window.
+ * @param {string} [options.title='Window'] - The title of the window.
+ * @param {string|HTMLElement} [options.content=''] - The content of the window. Can be a string or an HTMLElement.
+ * @param {number} [options.width=400] - The width of the window.
+ * @param {number} [options.height=300] - The height of the window.
+ * @param {number} [options.x=50] - The horizontal position of the window.
+ * @param {number} [options.y=50] - The vertical position of the window.
+ * @param {string} [options.statusText=''] - The status text displayed at the bottom of the window.
+ * @param {function} [options.onClose=null] - Callback function triggered when the window is closed.
+ * @param {function} [options.onMinimize=null] - Callback function triggered when the window is minimized.
+ * @param {function} [options.onMaximize=null] - Callback function triggered when the window is maximized.
+ * @param {function} [options.onRestore=null] - Callback function triggered when the window is restored from maximized state.
+ * @param {boolean} [options.draggable=true] - Whether the window can be dragged.
+ * @param {boolean} [options.resizable=true] - Whether the window can be resized.
+ * @param {string} [options.icon=null] - The URL of the icon displayed in the window's title bar.
+ * @param {number} [options.taskbarX=10] - The horizontal position of the taskbar button when the window is minimized.
+ * @param {number} [options.taskbarY=10] - The vertical position of the taskbar button when the window is minimized.
+ * @returns {HTMLElement} The created window element.
+ */
+
+/**
+ * Gets all currently open windows.
+ *
+ * @function
+ * @name getAllWindows
+ * @memberof ClassicWindow
+ * @returns {HTMLElement[]} An array of all window elements.
+ */
+
+/**
+ * Closes all currently open windows and clears the taskbar.
+ *
+ * @function
+ * @name closeAllWindows
+ * @memberof ClassicWindow
+ */
+
+/**
+ * Updates the content of a specified window.
+ *
+ * @function
+ * @name updateWindowContent
+ * @memberof ClassicWindow
+ * @param {HTMLElement} windowElement - The window element to update.
+ * @param {string|HTMLElement} newContent - The new content for the window. Can be a string or an HTMLElement.
+ */
+
+/**
+ * Updates the status text of a specified window.
+ *
+ * @function
+ * @name updateStatusText
+ * @memberof ClassicWindow
+ * @param {HTMLElement} windowElement - The window element to update.
+ * @param {string} newStatusText - The new status text for the window.
+ */
+
 (function(g){'use strict';function i(){if(!document.getElementById('c-s')){const s=document.createElement('style');s.id='c-s';s.textContent='.c-w{position:absolute;background-color:rgba(32,32,32,.95);border:1px solid rgba(255,255,255,.1);border-radius:8px;box-shadow:0 10px 25px rgba(0,0,0,.25);overflow:hidden;min-width:300px;min-height:200px;z-index:100;font-family:"Segoe UI",sans-serif;backdrop-filter:blur(10px)}.c-tb{background:transparent;padding:8px 12px;color:white;font-weight:normal;cursor:move;display:flex;justify-content:space-between;align-items:center;user-select:none;height:28px}.c-t{font-size:13px;margin-right:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:8px}.c-icon{width:16px;height:16px;margin-right:6px;object-fit:contain}.c-cs{display:flex;gap:4px}.c-c{width:24px;height:24px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;color:#fff;opacity:.7;transition:all .2s;border-radius:4px}.c-c:hover{opacity:1;background-color:rgba(255,255,255,.1)}.c-m svg,.c-x svg,.c-cl svg{width:10px;height:10px;fill:currentColor}.c-cl:hover{background-color:#e81123;color:#fff;opacity:1}.c-cnt{padding:15px;overflow:auto;color:#f0f0f0;font-size:14px;height:calc(100% - 66px);box-sizing:border-box}.c-sb{background-color:rgba(32,32,32,.7);border-top:1px solid rgba(255,255,255,.05);padding:6px 15px;font-size:12px;color:#bbb;position:absolute;bottom:0;width:100%;box-sizing:border-box}.c-w.max{width:100%!important;height:100%!important;top:0!important;left:0!important;border-radius:0!important}.c-mb{background:rgba(32,32,32,.9);color:white;border:1px solid rgba(255,255,255,.1);padding:8px 15px;border-radius:6px;cursor:pointer;margin:5px;font-size:12px;font-family:"Segoe UI",sans-serif;transition:all .2s;display:flex;align-items:center;gap:8px}.c-mb:hover{background:rgba(45,45,45,.9)}.c-mb-icon{width:14px;height:14px;object-fit:contain}';document.head.appendChild(s)}}function e(x=10,y=10){let c=document.getElementById('c-mc');if(!c){c=document.createElement('div');c.id='c-mc';c.style.position='fixed';c.style.bottom=y+'px';c.style.left=x+'px';c.style.zIndex='1000';document.body.appendChild(c)}return c}function t(){const w=document.querySelectorAll('.c-w');let m=100;w.forEach(n=>{const z=parseInt(window.getComputedStyle(n).zIndex,10);if(!isNaN(z)&&z>m)m=z});return m}function c(o={}){i();const d={title:'Window',content:'',width:400,height:300,x:50,y:50,statusText:'',onClose:null,onMinimize:null,onMaximize:null,onRestore:null,draggable:!0,resizable:!0,icon:null,taskbarX:10,taskbarY:10},s=Object.assign({},d,o),w=document.createElement('div');w.className='c-w';w.style.width=s.width+'px';w.style.height=s.height+'px';w.style.left=s.x+'px';w.style.top=s.y+'px';w.dataset.title=s.title;w.id='cw-'+Date.now();const b=document.createElement('div');b.className='c-tb';const l=document.createElement('div');l.className='c-t';if(s.icon){const ic=document.createElement('img');ic.className='c-icon';ic.src=s.icon;l.appendChild(ic)}const titleText=document.createTextNode(s.title);l.appendChild(titleText);const k=document.createElement('div');k.className='c-cs';const n=document.createElement('div');n.className='c-c c-m';n.innerHTML='<svg viewBox="0 0 10 1"><path d="M0,0.5 L10,0.5" stroke="currentColor" stroke-width="1"/></svg>';n.title='Minimize';const x=document.createElement('div');x.className='c-c c-x';x.innerHTML='<svg viewBox="0 0 10 10"><rect x="0" y="0" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1"/></svg>';x.title='Maximize';const q=document.createElement('div');q.className='c-c c-cl';q.innerHTML='<svg viewBox="0 0 10 10"><path d="M1,1 L9,9 M9,1 L1,9" stroke="currentColor" stroke-width="1.5"/></svg>';q.title='Close';k.appendChild(n);k.appendChild(x);k.appendChild(q);b.appendChild(l);b.appendChild(k);const j=document.createElement('div');j.className='c-cnt';if(typeof s.content==='string')j.innerHTML=s.content;else if(s.content instanceof HTMLElement)j.appendChild(s.content);const f=document.createElement('div');f.className='c-sb';f.textContent=s.statusText;w.appendChild(b);w.appendChild(j);w.appendChild(f);document.body.appendChild(w);q.addEventListener('click',()=>{if(typeof s.onClose==='function')s.onClose();w.remove()});n.addEventListener('click',()=>{w.style.display='none';if(typeof s.onMinimize==='function')s.onMinimize();const r=e(s.taskbarX,s.taskbarY),h=document.createElement('button');h.className='c-mb';h.dataset.windowId=w.id;if(s.icon){const mbIcon=document.createElement('img');mbIcon.className='c-mb-icon';mbIcon.src=s.icon;h.appendChild(mbIcon)}h.appendChild(document.createTextNode(s.title));h.addEventListener('click',()=>{w.style.display='block';w.style.zIndex=t()+1;h.remove()});r.appendChild(h)});let y={width:s.width,height:s.height,x:s.x,y:s.y};function toggleMaximize(){if(w.classList.contains('max')){w.classList.remove('max');w.style.width=y.width+'px';w.style.height=y.height+'px';w.style.left=y.x+'px';w.style.top=y.y+'px';x.innerHTML='<svg viewBox="0 0 10 10"><rect x="0" y="0" width="10" height="10" fill="none" stroke="currentColor" stroke-width="1"/></svg>';if(typeof s.onRestore==='function')s.onRestore()}else{y={width:w.offsetWidth,height:w.offsetHeight,x:w.offsetLeft,y:w.offsetTop};w.classList.add('max');x.innerHTML='<svg viewBox="0 0 10 10"><path d="M3,3 v-2 h7 v7 h-2 M0,3 h7 v7 h-7 z" fill="none" stroke="currentColor" stroke-width="1"/></svg>';if(typeof s.onMaximize==='function')s.onMaximize()}}x.addEventListener('click',toggleMaximize);b.addEventListener('dblclick',toggleMaximize);if(s.draggable){let p=!1,v=0,u=0;b.addEventListener('mousedown',a=>{if(w.classList.contains('max'))return;if(a.target!==b&&a.target!==l&&!l.contains(a.target))return;p=!0;v=a.clientX-w.offsetLeft;u=a.clientY-w.offsetTop;w.style.zIndex=t()+1});document.addEventListener('mousemove',a=>{if(!p)return;const newX=a.clientX-v;const newY=a.clientY-u;w.style.left=newX+'px';w.style.top=newY+'px';if(newY<10){w.classList.add('max');x.innerHTML='<svg viewBox="0 0 10 10"><path d="M3,3 v-2 h7 v7 h-2 M0,3 h7 v7 h-7 z" fill="none" stroke="currentColor" stroke-width="1"/></svg>';p=!1;if(typeof s.onMaximize==='function')s.onMaximize()}else if(newX<10){w.style.left='0px';w.style.top='0px';w.style.width='50%';w.style.height='100%';y={width:s.width,height:s.height,x:s.x,y:s.y};p=!1}else if(newX>window.innerWidth-10){w.style.left='50%';w.style.top='0px';w.style.width='50%';w.style.height='100%';y={width:s.width,height:s.height,x:s.x,y:s.y};p=!1}});document.addEventListener('mouseup',()=>{p=!1});}w.addEventListener('mousedown',()=>{w.style.zIndex=t()+1});w.style.zIndex=t()+1;return w}function a(){return Array.from(document.querySelectorAll('.c-w'))}function b(){a().forEach(w=>w.remove());const c=document.getElementById('c-mc');if(c)c.innerHTML=''}function u(w,c){if(!w||!w.classList.contains('c-w'))return;const j=w.querySelector('.c-cnt');if(!j)return;if(typeof c==='string')j.innerHTML=c;else if(c instanceof HTMLElement){j.innerHTML='';j.appendChild(c)}}function s(w,t){if(!w||!w.classList.contains('c-w'))return;const b=w.querySelector('.c-sb');if(b)b.textContent=t}g.ClassicWindow={createWindow:c,getAllWindows:a,closeAllWindows:b,updateWindowContent:u,updateStatusText:s,getTopZIndex:t}})(typeof window!=='undefined'?window:this);
