@@ -10,7 +10,8 @@ function spawnBrowser(event) {
         x: Math.round((window.innerWidth - 500) / 2),
         y: Math.round((window.innerHeight - 400) / 2),
         theme: 'dark',
-        icon: 'assets/img/ie.svg', //this icon is under MIT licence
+        icon: 'assets/img/ie.svg', //this icon is under MIT licence,
+        resizable: false,
         statusText: 'NoSkidBrowser v69',
     });
 
@@ -118,7 +119,7 @@ function doShitWithQuery(win, query) {
         
         iframe {
             width: 780px;
-            height: 600px;
+            height: 460px;
             border: none;
             display: block;
         }
