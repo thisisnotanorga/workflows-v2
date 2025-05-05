@@ -271,7 +271,7 @@ function offerCertificate(score) {
           log('Certificate downloaded!', 'success');
           quizForm.innerHTML = `<p>✅ Certificate downloaded! Check if a certificate is valid with \'Shift + C\'</p>
           <br>
-          If you like this website consider adding a star to [the github](https://github.com/douxxtech/noskid.today) <3`;
+          <p>If you like this website consider adding a star to <a href="https://github.com/douxxtech/noskid.today" target="_blank"the github</a> <3</p>`;
           certificateSection.style.display = 'none';
       } else {
           alert('Please enter a valid name.');
