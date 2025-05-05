@@ -269,7 +269,9 @@ function offerCertificate(score) {
       if (username) {
           window.location.href = `api/downcert?percentage=${percentage.toFixed(2)}&name=${encodeURIComponent(username)}`;
           log('Certificate downloaded!', 'success');
-          quizForm.innerHTML = '<p>✅ Certificate downloaded! Check if a certificate is valid with \'Shift + C\'</p>';
+          quizForm.innerHTML = `<p>✅ Certificate downloaded! Check if a certificate is valid with \'Shift + C\'</p>
+          <br>
+          If you like this website consider adding a star to [the github](https://github.com/douxxtech/noskid.today) <3`;
           certificateSection.style.display = 'none';
       } else {
           alert('Please enter a valid name.');
