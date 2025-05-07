@@ -9,8 +9,8 @@
   <rect width="100" height="30" rx="4" ry="4" fill="url(#button-bg)" stroke="#8b4513" stroke-width="0.8"/>
   
   <!-- percent -->
-  <circle cx="13" cy="15" r="11" fill="none" stroke="#8b4513" stroke-width="0.8"/>
-  <text x="13" y="17" fill="#8b4513" font-size="6" font-family="'Times New Roman', serif" font-weight="bold" text-anchor="middle">{{PERCENT}}</text>
+  <circle cx="18" cy="15" r="11" fill="none" stroke="#8b4513" stroke-width="0.8"/>
+  <text x="18" y="17" fill="#8b4513" font-size="6" font-family="'Times New Roman', serif" font-weight="bold" text-anchor="middle">{{PERCENT}}</text>
   
   <!-- title -->
   <text x="60" y="13" fill="#8b4513" font-size="7" font-family="'Times New Roman', serif" font-weight="bold" text-anchor="middle">NOSKID</text>
