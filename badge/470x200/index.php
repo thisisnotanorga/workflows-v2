@@ -165,8 +165,14 @@ function serveErrorSvg($errorCode) {
     
     if (file_exists($svgPath)) {
         header('Content-Type: image/svg+xml');
-        header('Cache-Control: public, max-age=3600');
-        header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 3600));
+        if (isset($_GET['cache']) && $_GET['cache'] === 'false') {
+            header('Cache-Control: no-cache, no-store, must-revalidate');
+            header('Pragma: no-cache');
+            header('Expires: 0');
+        } else {
+            header('Cache-Control: public, max-age=86400');
+            header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
+        }
         readfile($svgPath);
     } else {
         header('Content-Type: text/plain');
@@ -223,9 +229,14 @@ if (isset($_GET['repo'])) {
             $svgContent = str_replace('{{PERCENT}}', htmlspecialchars($certificatePercentage), $svgContent);
             
             header('Content-Type: image/svg+xml');
-            header('Cache-Control: public, max-age=86400');
-            header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
-            
+            if (isset($_GET['cache']) && $_GET['cache'] === 'false') {
+                header('Cache-Control: no-cache, no-store, must-revalidate');
+                header('Pragma: no-cache');
+                header('Expires: 0');
+            } else {
+                header('Cache-Control: public, max-age=86400');
+                header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
+            }
             echo $svgContent;
             exit;
         } else {
@@ -276,9 +287,14 @@ if (isset($_GET['repo'])) {
     $svgContent = str_replace('{{PERCENT}}', htmlspecialchars($certificatePercentage), $svgContent);
     
     header('Content-Type: image/svg+xml');
-    header('Cache-Control: public, max-age=86400');
-    header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
-    
+    if (isset($_GET['cache']) && $_GET['cache'] === 'false') {
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+    } else {
+        header('Cache-Control: public, max-age=86400');
+        header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
+    }
     echo $svgContent;
     exit;
 }  else {
