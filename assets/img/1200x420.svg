@@ -14,7 +14,7 @@
   
   <!-- title -->
   <rect x="150" y="60" width="490" height="70" rx="8" ry="8" fill="#ffffff" stroke="#d0bb96" stroke-width="2"/>
-  <text x="180" y="110" fill="#8b6b43" font-size="40" font-family="Arial, sans-serif" font-weight="bold">Certificate of Expertise</text>
+  <text x="220" y="110" fill="#8b6b43" font-size="40" font-family="Arial, sans-serif" font-weight="bold">NoSkid Certificate</text>
   
   <!-- username -->
   <rect x="150" y="160" width="900" height="100" rx="8" ry="8" fill="#ffffff" stroke="#d0bb96" stroke-width="2"/>
@@ -24,7 +24,7 @@
   <!-- score -->
   <rect x="150" y="290" width="430" height="80" rx="8" ry="8" fill="#ffffff" stroke="#d0bb96" stroke-width="2"/>
   <text x="180" y="330" fill="#444444" font-size="26" font-family="Arial, sans-serif">Proficiency Rating:</text>
-  <text x="430" y="345" fill="#8b6b43" font-size="36" font-family="Arial, sans-serif" font-weight="bold">88.88%</text>
+  <text x="430" y="345" fill="#8b6b43" font-size="36" font-family="Arial, sans-serif" font-weight="bold">{{PERCENT}}%</text>
   
   <!-- idk hole filling shit -->
   <rect x="620" y="290" width="430" height="80" rx="8" ry="8" fill="#ffffff" stroke="#d0bb96" stroke-width="2"/>

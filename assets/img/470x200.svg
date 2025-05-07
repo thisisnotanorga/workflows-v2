@@ -4,7 +4,7 @@
   <rect x="10" y="10" width="450" height="12" rx="6" ry="6" fill="#d0bb96"/>
   
   <!-- title -->
-  <text x="30" y="60" fill="#8b6b43" font-size="20" font-family="Arial, sans-serif" font-weight="bold">Certificate of Expertise</text>
+  <text x="30" y="60" fill="#8b6b43" font-size="20" font-family="Arial, sans-serif" font-weight="bold">NoSkid Certificate</text>
   <line x1="30" y1="75" x2="440" y2="75" stroke="#e6dcc6" stroke-width="2"/>
   
   <!-- user -->
