@@ -1,5 +1,5 @@
 <?php
-//Be sure of having the database set up before checking if a cert is valid
+// Be sure of having the database set up before checking if a cert is valid
 
 define('DB_HOST', 'dbhost');
 define('DB_USER', 'dbuser');
@@ -10,41 +10,39 @@ function extractVerificationKeyFromPng($fileContent) {
     if (substr($fileContent, 0, 8) !== "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A") {
         return null;
     }
-    
+
     $position = 8;
     $length = strlen($fileContent);
-    
+
     while ($position < $length) {
         $chunkLength = unpack("N", substr($fileContent, $position, 4))[1];
         $chunkType = substr($fileContent, $position + 4, 4);
-        
+
         if ($chunkType === 'tEXt') {
             $chunkData = substr($fileContent, $position + 8, $chunkLength);
             $nullPos = strpos($chunkData, "\0");
-            
+
             if ($nullPos !== false) {
                 $keyword = substr($chunkData, 0, $nullPos);
                 $value = substr($chunkData, $nullPos + 1);
-                
+
                 if ($keyword === 'noskid-key') {
                     return extractVerificationKey($value);
                 }
             }
         }
-        
+
         $position += 8 + $chunkLength + 4;
     }
-    
+
     return null;
 }
-
-
 
 function extractVerificationKey($text) {
     if (preg_match('/-*BEGIN NOSKID KEY-*\s*([a-f0-9]{64})/i', $text, $matches)) {
         return $matches[1];
     }
-    
+
     return null;
 }
 
@@ -65,8 +63,8 @@ function verifyCertificateKey($key) {
         ];
     }
 
-    $stmt = $mysqli->prepare("SELECT c.id, c.name, c.percentage, c.created_at, c.verification_key 
-                            FROM cert c 
+    $stmt = $mysqli->prepare("SELECT c.id, c.name, c.percentage, c.created_at, c.verification_key
+                            FROM cert c
                             WHERE c.verification_key LIKE CONCAT(?, '|%')");
 
     if (!$stmt) {
@@ -94,7 +92,7 @@ function verifyCertificateKey($key) {
     $mysqli->close();
 
     $certNumber = str_pad($cert['id'], 5, '0', STR_PAD_LEFT);
-    
+
     $creationDate = $cert['created_at'];
 
     return [
@@ -112,11 +110,11 @@ function verifyCertificateKey($key) {
 function getGithubFileContent($owner, $path) {
     $url = "https://raw.githubusercontent.com/{$owner}/{$owner}/master/{$path}";
     $content = @file_get_contents($url);
-    
+
     if ($content === false) {
         return null;
     }
-    
+
     return $content;
 }
 
@@ -124,26 +122,26 @@ function getWebsiteFileContent($url, $path) {
     if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
         $url = "http://" . $url;
     }
-    
+
     if (substr($url, -1) !== '/') {
         $url .= '/';
     }
-    
+
     $fileUrl = $url . $path;
-    
+
     $context = stream_context_create([
         'http' => [
             'follow_location' => true,
             'max_redirects' => 5
         ]
     ]);
-    
+
     $content = @file_get_contents($fileUrl, false, $context);
-    
+
     if ($content === false) {
         return null;
     }
-    
+
     return $content;
 }
 
@@ -151,18 +149,18 @@ function extractDomainName($url) {
     if (!preg_match('~^(?:f|ht)tps?://~i', $url)) {
         $url = "http://" . $url;
     }
-    
+
     $parsedUrl = parse_url($url);
     if (isset($parsedUrl['host'])) {
         return preg_replace('/^www\./', '', $parsedUrl['host']);
     }
-    
+
     return $url;
 }
 
 function serveErrorSvg($errorCode) {
     $svgPath = "../../assets/img/{$errorCode}.svg";
-    
+
     if (file_exists($svgPath)) {
         header('Content-Type: image/svg+xml');
         if (isset($_GET['cache']) && $_GET['cache'] === 'false') {
@@ -184,32 +182,33 @@ function serveErrorSvg($errorCode) {
 if (isset($_GET['repo'])) {
     $repoPath = $_GET['repo'];
     $useOriginalName = isset($_GET['oname']) && ($_GET['oname'] === 'true' || $_GET['oname'] === '1');
-    
+    $customUser = isset($_GET['user']) ? $_GET['user'] : null;
+
     if (strpos($repoPath, '/') !== false) {
         list($owner, $repo) = explode('/', $repoPath, 2);
-        
+
         $certificatePath = 'noskid/certificate.png';
         $certificateContent = getGithubFileContent($owner, $certificatePath);
-        
+
         if ($certificateContent === null) {
             serveErrorSvg('404');
         }
-        
+
         $verificationKey = extractVerificationKeyFromPng($certificateContent);
-        
+
         if ($verificationKey === null) {
             serveErrorSvg('403');
         }
-        
+
         $verificationResult = verifyCertificateKey($verificationKey);
-        
+
         if (!$verificationResult['success']) {
             serveErrorSvg('403');
         }
-        
+
         $certificateUsername = $verificationResult['data']['username'];
         $certificatePercentage = $verificationResult['data']['percentage'];
-        
+
         if ($useOriginalName) {
             $displayUsername = $certificateUsername;
         } else {
@@ -218,16 +217,20 @@ if (isset($_GET['repo'])) {
                 $displayUsername = "$repo's owner";
             }
         }
-        
+
+        if ($customUser !== null) {
+            $displayUsername = $customUser;
+        }
+
         if ($certificateUsername == $owner) {
             $svgTemplate = file_get_contents('../../assets/img/470x200.svg');
             if ($svgTemplate === false) {
                 serveErrorSvg('422');
             }
-            
+
             $svgContent = str_replace('{{USER}}', htmlspecialchars($displayUsername), $svgTemplate);
             $svgContent = str_replace('{{PERCENT}}', htmlspecialchars($certificatePercentage), $svgContent);
-            
+
             header('Content-Type: image/svg+xml');
             if (isset($_GET['cache']) && $_GET['cache'] === 'false') {
                 header('Cache-Control: no-cache, no-store, must-revalidate');
@@ -248,44 +251,49 @@ if (isset($_GET['repo'])) {
 } elseif (isset($_GET['website'])) {
     $websiteUrl = $_GET['website'];
     $useOriginalName = isset($_GET['oname']) && ($_GET['oname'] === 'true' || $_GET['oname'] === '1');
-    
+    $customUser = isset($_GET['user']) ? $_GET['user'] : null;
+
     $certificatePath = 'noskid/certificate.png';
     $certificateContent = getWebsiteFileContent($websiteUrl, $certificatePath);
-    
+
     if ($certificateContent === null) {
         serveErrorSvg('404');
     }
-    
+
     $verificationKey = extractVerificationKeyFromPng($certificateContent);
-    
+
     if ($verificationKey === null) {
         serveErrorSvg('403');
     }
-    
+
     $verificationResult = verifyCertificateKey($verificationKey);
-    
+
     if (!$verificationResult['success']) {
         serveErrorSvg('403');
     }
-    
+
     $certificateUsername = $verificationResult['data']['username'];
     $certificatePercentage = $verificationResult['data']['percentage'];
-    
+
     if ($useOriginalName) {
         $displayUsername = $certificateUsername;
     } else {
         $domainName = extractDomainName($websiteUrl);
         $displayUsername = "$domainName's owner";
     }
-    
+
+    if ($customUser !== null) {
+        $displayUsername = $customUser;
+    }
+
     $svgTemplate = file_get_contents('../../assets/img/470x200.svg');
     if ($svgTemplate === false) {
         serveErrorSvg('422');
     }
-    
+
     $svgContent = str_replace('{{USER}}', htmlspecialchars($displayUsername), $svgTemplate);
     $svgContent = str_replace('{{PERCENT}}', htmlspecialchars($certificatePercentage), $svgContent);
-    
+
     header('Content-Type: image/svg+xml');
     if (isset($_GET['cache']) && $_GET['cache'] === 'false') {
         header('Cache-Control: no-cache, no-store, must-revalidate');
@@ -295,9 +303,10 @@ if (isset($_GET['repo'])) {
         header('Cache-Control: public, max-age=86400');
         header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 86400));
     }
+
     echo $svgContent;
     exit;
-}  else {
+} else {
     serveErrorSvg('422');
 }
 ?>

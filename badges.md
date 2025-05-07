@@ -76,6 +76,15 @@ https://noskid.today/badge/470x200?repo=username/repository&oname=true
 https://noskid.today/badge/470x200?website=https://example.com&oname=true
 ```
 
+### Custom Name Display
+
+You can specify a default name, that will be set instead of the default name, by adding the `user=<string (url encoded)>` parameter:
+
+```
+https://noskid.today/badge/470x200?repo=username/repository&user=Noskid+is+incredible
+https://noskid.today/badge/470x200?website=https://example.com&user=Noskid+is+incredible
+```
+
 ### Disabling caching
 
 By defualt, the server will serve the ressource with a cache header so we don't get flooded. If you need to disable the cache, add the `cache=false` parameter:
