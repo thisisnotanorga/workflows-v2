@@ -7,7 +7,9 @@ We dont like skids.
 A website based on [nohello.net](https://nohello.net), but heavily modified with rich features !
 
 > [!TIP]
-> New feature ! Noskid badges: Check the [badges.md](badges.md)  
+> New feature ! Noskid badges:  
+> Check the [badges.md](badges.md)  
+>  
 > [![NoSkid Verification](https://noskid.today/badge/100x30/?repo=douxxtech/noskid.today)](https://noskid.today)  
 
 
