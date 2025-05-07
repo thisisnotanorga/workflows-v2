@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="470" height="200" fill="none">
+  <rect width="470" height="200" rx="10" ry="10" fill="#f7f3e9"/>
+  <rect x="10" y="10" width="450" height="180" rx="8" ry="8" fill="#ffffff" stroke="#d0bb96" stroke-width="2"/>
+  <rect x="10" y="10" width="450" height="12" rx="6" ry="6" fill="#d0bb96"/>
+  
+  <!-- title -->
+  <text x="30" y="60" fill="#8b6b43" font-size="20" font-family="Arial, sans-serif" font-weight="bold">Certificate of Expertise</text>
+  <line x1="30" y1="75" x2="440" y2="75" stroke="#e6dcc6" stroke-width="2"/>
+  
+  <!-- user -->
+  <text x="30" y="110" fill="#444444" font-size="14" font-family="Arial, sans-serif">Awarded to:</text>
+  <text x="30" y="140" fill="#000000" font-size="22" font-family="Arial, sans-serif" font-weight="bold">{{USER}}</text>
+  
+  <!-- sscore -->
+  <text x="30" y="175" fill="#444444" font-size="14" font-family="Arial, sans-serif">Proficiency:</text>
+  <text x="120" y="175" fill="#8b6b43" font-size="18" font-family="Arial, sans-serif" font-weight="bold">{{PERCENT}}%</text>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 30">
+  <defs>
+    <linearGradient id="button-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f9f7f0" />
+      <stop offset="100%" style="stop-color:#e0ddd0" />
+    </linearGradient>
+  </defs>
+
+  <rect width="100" height="30" rx="4" ry="4" fill="url(#button-bg)" stroke="#8b4513" stroke-width="0.8"/>
+  
+  <!-- icon -->
+  <circle cx="13" cy="15" r="9" fill="none" stroke="#8b4513" stroke-width="0.8"/>
+  <text x="13" y="18" fill="#8b4513" font-size="10" font-family="'Times New Roman', serif" font-weight="bold" text-anchor="middle">!</text>
+  
+  <!-- title -->
+  <text x="60" y="13" fill="#8b4513" font-size="7" font-family="'Times New Roman', serif" font-weight="bold" text-anchor="middle">NOT FOUND</text>
+  <text x="60" y="22" fill="#8b4513" font-size="8" font-family="'Times New Roman', serif" font-weight="bold" text-anchor="middle">404</text>
+</svg>
