@@ -85,13 +85,13 @@ If your badge fails to display properly, you may see one of these error SVGs:
 
 ## Examples
 
-[`100x30`](https://noskid.today)
+`100x30`
 [![NoSkid Verification](https://noskid.today/badge/100x30/?repo=douxxtech/noskid.today)](https://noskid.today)
 
-[`470x200`](https://noskid.today)
+`470x200`
 [![NoSkid Verification](https://noskid.today/badge/470x200/?repo=douxxtech/noskid.today)](https://noskid.today)
 
-[`1200x420`](https://noskid.today)
+`1200x420`
 [![NoSkid Verification](https://noskid.today/badge/1200x420/?repo=douxxtech/noskid.today)](https://noskid.today)
 
 ## FAQ
