@@ -5,7 +5,12 @@ let total_requests = -1;
 
 async function showStats() {
     if (unique_views == -1) {
-        await getReqCount();
+        if (localStorage.getItem('dpipTrack') === 'false') {
+            log('dpipTrack set to false, not tracking.', 'warning');
+        } else {
+            await getReqCount();
+        }
+        
         logStats();
     } else {
         logStats();

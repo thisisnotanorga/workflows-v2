@@ -352,6 +352,8 @@
 
   width: 100%;
 
+  box-sizing: border-box;
+
   padding: clamp(8px, 2vw, 12px);
 
   margin-bottom: clamp(12px, 2vw, 15px);
