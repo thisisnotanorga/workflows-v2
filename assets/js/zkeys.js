@@ -116,6 +116,10 @@ const sequences = {
     'again': {
         action: againAndAgain,
         description: 'A new noskid window, but why?'
+    },
+    'bypass': {
+        action: redoQuiz,
+        description: 'Bypass quiz error message to redo it'
     }
 };
 
