@@ -49,6 +49,7 @@ class ScriptLoader {
             'assets/js/rick.js',
             'assets/js/terminal.js',
             'assets/js/track.js',
+            'assets/js/url.js',
             'assets/js/warning.js',
             'assets/js/zkeys.js',
         ];
