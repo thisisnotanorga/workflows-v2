@@ -31,6 +31,6 @@ Licensed under the [GPL-3.0 License](LICENSE)
 
 Thanks to all the [contributors](https://github.com/douxxtech/noskid.today/graphs/contributors) <3
 
-<a align="center" href="/douxxtech" target="_blank">
+<a align="center" href="https://github.com/douxxtech" target="_blank">
 <img src="https://madeby.douxx.tech"></img>
 </a>
