@@ -28,7 +28,9 @@ php -S 0.0.0.0:80
 
 ## Yapyap
 Licensed under the [GPL-3.0 License](LICENSE)
-  
-Created by [douxxtech](https://github.com/douxxtech)
 
 Thanks to all the [contributors](https://github.com/douxxtech/noskid.today/graphs/contributors) <3
+
+<a align="center" href="/douxxtech" target="_blank">
+<img src="https://madeby.douxx.tech"></img>
+</a>
