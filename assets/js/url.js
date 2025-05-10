@@ -2,8 +2,6 @@
 
 
 const messages = [
-    'By douxx.tech',
-    '@douxx.xyz on discord',
     'can i have one chezburger please? mm chezburger', // by @danrybir on discord
     'gary', //by @.zach.o on discord
     'mateishomepage technologies', //by @bmpimg on discord
