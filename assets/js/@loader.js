@@ -108,7 +108,7 @@ class ScriptLoader {
                 log(`${functionName} is not a function`, 'error');
             }
         } catch (error) {
-            log(`Erreur lors de l'exécution de la fonction ${functionName}: ${error.message}`, 'error');
+            log(`Error while running ${functionName}: ${error.message}`, 'error');
             console.error(error);
         }
     }
