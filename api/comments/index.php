@@ -54,6 +54,39 @@ if ($conn->connect_error) {
     exit;
 }
 
+function getBadWords() {
+    $badWordsFile = './bw.txt';
+    if (!file_exists($badWordsFile)) {
+        return [];
+    }
+    
+    $content = file_get_contents($badWordsFile);
+    if ($content === false) {
+        return [];
+    }
+    
+    $badWords = array_filter(array_map('trim', explode("\n", $content)));
+    return $badWords;
+}
+
+function censorBadWords($text) {
+    $badWords = getBadWords();
+    if (empty($badWords)) {
+        return $text;
+    }
+    
+    foreach ($badWords as $word) {
+        if (empty($word)) continue;
+        
+        $pattern = '/\b' . preg_quote($word, '/') . '\b/i';
+        $replacement = str_repeat('#', strlen($word));
+        
+        $text = preg_replace($pattern, $replacement, $text);
+    }
+    
+    return $text;
+}
+
 function getUserFingerprint() {
     $ip = $_SERVER['REMOTE_ADDR'];
     $userAgent = $_SERVER['HTTP_USER_AGENT'];
@@ -64,7 +97,6 @@ $userFingerprint = getUserFingerprint();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
-// Gestion des actions via paramètres GET
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 $commentId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -138,8 +170,10 @@ function addComment($conn, $userFingerprint) {
     
     $author = isset($data['author']) && !empty(trim($data['author'])) ? 
               trim($data['author']) : 'Anonymous';
-              
-    $content = trim($data['content']);
+    
+    // Censorship yeaahhh   
+    $content = censorBadWords(trim($data['content']));
+    $author = censorBadWords(trim($author));
     
     $sql = "INSERT INTO comments_posts (author, content, user_fingerprint) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
@@ -172,7 +206,6 @@ function addComment($conn, $userFingerprint) {
 }
 
 function handleReaction($conn, $commentId, $userFingerprint, $reactionType) {
-    // Vérifier si le commentaire existe
     $sql = "SELECT * FROM comments_posts WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $commentId);
