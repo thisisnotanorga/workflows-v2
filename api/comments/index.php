@@ -64,6 +64,7 @@ $userFingerprint = getUserFingerprint();
 
 $method = $_SERVER['REQUEST_METHOD'];
 
+// Gestion des actions via paramètres GET
 $action = isset($_GET['action']) ? $_GET['action'] : null;
 $commentId = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
@@ -85,30 +86,33 @@ switch($method) {
 }
 
 function getComments($conn, $userFingerprint) {
-    $sql = "SELECT cp.id, cp.author, cp.content, cp.created_at as date, 
+    $sql = "SELECT cp.id, cp.author, cp.content, cp.created_at as date,
             cp.likes, cp.dislikes,
             (SELECT reaction_type FROM comments_reactions WHERE comment_id = cp.id AND user_fingerprint = ?) as user_reaction
-            FROM comments_posts cp 
+            FROM comments_posts cp
             ORDER BY cp.created_at DESC";
-    
+
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("s", $userFingerprint);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result === false) {
         http_response_code(500);
         echo json_encode(['error' => 'Error fetching comments: ' . $conn->error]);
         return;
     }
-    
+
     $comments = [];
     while ($row = $result->fetch_assoc()) {
+        $row['content'] = htmlspecialchars($row['content'], ENT_QUOTES, 'UTF-8');
+        $row['author'] = htmlspecialchars($row['author'], ENT_QUOTES, 'UTF-8');
         $comments[] = $row;
     }
-    
+
     echo json_encode($comments);
 }
+
 
 function addComment($conn, $userFingerprint) {
     $today = date('Y-m-d');
@@ -168,6 +172,7 @@ function addComment($conn, $userFingerprint) {
 }
 
 function handleReaction($conn, $commentId, $userFingerprint, $reactionType) {
+    // Vérifier si le commentaire existe
     $sql = "SELECT * FROM comments_posts WHERE id = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("i", $commentId);
