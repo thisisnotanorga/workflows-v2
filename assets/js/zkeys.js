@@ -45,6 +45,11 @@ const keyBindings = [
         keys: ['Shift', 'B'],
         action: spawnBrowser,
         description: 'Search inside of noskid !'
+    },
+    {
+        keys: ['Shift', 'T'],
+        action: spawnCommentSystem,
+        description: 'Tell us what you think about noskid !'
     }
 ];
 
