@@ -172,7 +172,7 @@ function spawnNewCommentForm() {
         height: 300,
         x: Math.round((window.innerWidth - 400) / 2),
         y: Math.round((window.innerHeight - 300) / 2),
-        content: `
+        content: cs(`
             <div>
                 <form>
                     <div>
@@ -189,7 +189,7 @@ function spawnNewCommentForm() {
                     </div>
                 </form>
             </div>
-        `,
+        `),
         theme: 'dark',
         resizable: false,
         statusText: 'Writing a new comment',
