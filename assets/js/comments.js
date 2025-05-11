@@ -244,13 +244,14 @@ function submitComment(form, window) {
         .then(data => {
             log('Comment added successfully', 'success');
 
-            ClassicWindow.closeWindow(window);
-
-            document.querySelectorAll('.window').forEach(win => {
+            ClassicWindow.getAllWindows().forEach(win => {
                 if (win.querySelector('.window-title').textContent === 'Comments') {
                     loadComments(win);
                 }
             });
+
+            ClassicWindow.closeWindow(window)
+            
         })
         .catch(error => {
             log('Error sending comment: ' + error.message, 'error');
