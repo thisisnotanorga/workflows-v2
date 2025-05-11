@@ -56,6 +56,61 @@ class ScriptLoader {
             'assets/js/zkeys.js',
         ];
         this.loadedCount = 0;
+        
+        this.pendingHashFunction = null;
+        this.checkHashFunction();
+    }
+    
+    checkHashFunction() {
+        const hash = window.location.hash;
+        
+        if (hash && hash.length > 1) {
+            const functionName = hash.substring(1);
+            log(`Func found in url: ${functionName}`, 'info');
+            
+            this.pendingHashFunction = functionName;
+        }
+    }
+    
+    executeHashFunction() {
+        if (!this.pendingHashFunction) return;
+        
+        const functionName = this.pendingHashFunction;
+        
+        try {
+            const event = {
+                preventDefault: function() {
+                    this.defaultPrevented = true;
+                },
+                defaultPrevented: false,
+                type: 'hashFunction',
+                target: document
+            };
+            
+            let functionToCall;
+            
+            if (typeof window[functionName] === 'function') {
+                functionToCall = window[functionName];
+            } 
+            // its dangerous, but who cares
+            else {
+                try {
+                    functionToCall = eval(functionName);
+                } catch (evalError) {
+                    log(`Cannot find: ${functionName}`, 'error');
+                    return;
+                }
+            }
+            
+            if (typeof functionToCall === 'function') {
+                functionToCall(event);
+            } else {
+                log(`${functionName} is not a function`, 'error');
+            }
+        } catch (error) {
+            log(`Erreur lors de l'exécution de la fonction ${functionName}: ${error.message}`, 'error');
+            console.error(error);
+        }
     }
 
     async loadScript(src) {
@@ -102,6 +157,11 @@ class ScriptLoader {
         
         log('All resources loaded successfully!', 'success');
         
+        if (this.pendingHashFunction) {
+            log(`Executing: ${this.pendingHashFunction}`, 'warning');
+            this.executeHashFunction();
+        }
+        
         setTimeout(() => {
             const loaderContainer = document.getElementById('loader-container');
             if (loaderContainer) {
@@ -116,4 +176,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const consoleElement = document.getElementById('console');
     const loader = new ScriptLoader(consoleElement);
     loader.loadAll();
+    
+    window.addEventListener('hashchange', () => {
+        loader.checkHashFunction();
+        if (loader.loadedCount === loader.scripts.length) {
+            loader.executeHashFunction();
+        }
+    });
 });
