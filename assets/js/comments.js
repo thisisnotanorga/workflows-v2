@@ -226,7 +226,7 @@ function submitComment(form, window) {
         content: content
     };
 
-    fetch('/api/comments', {
+    fetch('/api/comments/index.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
