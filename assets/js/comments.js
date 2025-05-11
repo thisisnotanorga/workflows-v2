@@ -244,8 +244,11 @@ function submitComment(form, window) {
         .then(data => {
             log('Comment added successfully', 'success');
 
-            ClassicWindow.getAllWindows().forEach(win => {
-                if (win.querySelector('.window-title').textContent === 'Comments') {
+            const allWindows = ClassicWindow.getAllWindows();
+
+            allWindows.forEach(win => {
+                const titleElement = win.querySelector('.c-t');
+                if (titleElement && titleElement.textContent === 'Comments') {
                     loadComments(win);
                 }
             });
