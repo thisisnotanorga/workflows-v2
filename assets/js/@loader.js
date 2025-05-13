@@ -36,6 +36,7 @@ class ScriptLoader {
             'assets/js/comments.js',
             'assets/js/console.js',
             'assets/js/cookies.js',
+            'assets/js/cool.js',
             'assets/js/cursor.js',
             'assets/js/cw.js',
             'assets/js/cw.utils.js',

@@ -125,6 +125,10 @@ const sequences = {
     'bypass': {
         action: redoQuiz,
         description: 'Bypass quiz error message to redo it'
+    },
+    'cool': {
+        action: spawnCool,
+        description: 'shows a cool thing'
     }
 };
 

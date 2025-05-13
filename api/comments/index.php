@@ -1,10 +1,10 @@
 <?php
+
 /*
 
 =============================
 DB SETUP
 =============================
-
 
 -- posts
 CREATE TABLE IF NOT EXISTS comments_posts (
@@ -14,10 +14,11 @@ CREATE TABLE IF NOT EXISTS comments_posts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     user_fingerprint VARCHAR(255) NOT NULL,
     likes INT DEFAULT 0,
-    dislikes INT DEFAULT 0
+    dislikes INT DEFAULT 0,
+    ip_address VARCHAR(45) NOT NULL DEFAULT '0.0.0.0'
 );
 
--- likes/dislikes
+-- like/dislike
 CREATE TABLE IF NOT EXISTS comments_reactions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     comment_id INT NOT NULL,
@@ -28,16 +29,23 @@ CREATE TABLE IF NOT EXISTS comments_reactions (
     UNIQUE KEY unique_reaction (comment_id, user_fingerprint)
 );
 
--- ratelimit shit
+-- uses
 CREATE TABLE IF NOT EXISTS comments_users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_fingerprint VARCHAR(255) NOT NULL,
     last_comment_date DATE NOT NULL,
+    ip_address VARCHAR(45) NOT NULL DEFAULT '0.0.0.0',
     UNIQUE KEY unique_user (user_fingerprint)
 );
 
+-- bl ip
+CREATE TABLE IF NOT EXISTS comments_blocked_ips (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    ip_address VARCHAR(45) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_ip (ip_address)
+);
 */
-
 
 header('Content-Type: application/json');
 
@@ -59,12 +67,12 @@ function getBadWords() {
     if (!file_exists($badWordsFile)) {
         return [];
     }
-    
+
     $content = file_get_contents($badWordsFile);
     if ($content === false) {
         return [];
     }
-    
+
     $badWords = array_filter(array_map('trim', explode("\n", $content)));
     return $badWords;
 }
@@ -74,16 +82,16 @@ function censorBadWords($text) {
     if (empty($badWords)) {
         return $text;
     }
-    
+
     foreach ($badWords as $word) {
         if (empty($word)) continue;
-        
+
         $pattern = '/\b' . preg_quote($word, '/') . '\b/i';
         $replacement = str_repeat('#', strlen($word));
-        
+
         $text = preg_replace($pattern, $replacement, $text);
     }
-    
+
     return $text;
 }
 
@@ -93,7 +101,31 @@ function getUserFingerprint() {
     return md5($ip . $userAgent);
 }
 
+function isIpBlocked($conn, $ip) {
+    $sql = "SELECT * FROM comments_blocked_ips WHERE ip_address = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $ip);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    return $result->num_rows > 0;
+}
+
+function blockIp($conn, $ip) {
+    $sql = "INSERT INTO comments_blocked_ips (ip_address) VALUES (?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $ip);
+    $stmt->execute();
+}
+
 $userFingerprint = getUserFingerprint();
+$ip = $_SERVER['REMOTE_ADDR'];
+
+if (isIpBlocked($conn, $ip)) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Your IP address has been blocked']);
+    exit;
+}
 
 $method = $_SERVER['REQUEST_METHOD'];
 
@@ -109,7 +141,7 @@ switch($method) {
         }
         break;
     case 'POST':
-        addComment($conn, $userFingerprint);
+        addComment($conn, $userFingerprint, $ip);
         break;
     default:
         http_response_code(405);
@@ -145,58 +177,57 @@ function getComments($conn, $userFingerprint) {
     echo json_encode($comments);
 }
 
-
-function addComment($conn, $userFingerprint) {
+function addComment($conn, $userFingerprint, $ip) {
     $today = date('Y-m-d');
     $sql = "SELECT * FROM comments_users WHERE user_fingerprint = ? AND last_comment_date = ?";
     $stmt = $conn->prepare($sql);
     $stmt->bind_param("ss", $userFingerprint, $today);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows > 0) {
         http_response_code(429);
         echo json_encode(['error' => 'You can only post one comment per day']);
         return;
     }
-    
+
     $data = json_decode(file_get_contents('php://input'), true);
-    
+
     if (!isset($data['content']) || empty(trim($data['content']))) {
         http_response_code(400);
         echo json_encode(['error' => 'Comment content is required']);
         return;
     }
-    
-    $author = isset($data['author']) && !empty(trim($data['author'])) ? 
+
+    $author = isset($data['author']) && !empty(trim($data['author'])) ?
               trim($data['author']) : 'Anonymous';
-    
-    // Censorship yeaahhh   
+
+    // Censorship yeaahhh
     $content = censorBadWords(trim($data['content']));
     $author = censorBadWords(trim($author));
-    
-    $sql = "INSERT INTO comments_posts (author, content, user_fingerprint) VALUES (?, ?, ?)";
+
+    $sql = "INSERT INTO comments_posts (author, content, user_fingerprint, ip_address) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("sss", $author, $content, $userFingerprint);
-    
+    $stmt->bind_param("ssss", $author, $content, $userFingerprint, $ip);
+
     if ($stmt->execute()) {
         $comment_id = $stmt->insert_id;
-        
-        $sql = "INSERT INTO comments_users (user_fingerprint, last_comment_date) 
-                VALUES (?, ?) 
-                ON DUPLICATE KEY UPDATE last_comment_date = ?";
+
+        $sql = "INSERT INTO comments_users (user_fingerprint, last_comment_date, ip_address)
+                VALUES (?, ?, ?)
+                ON DUPLICATE KEY UPDATE last_comment_date = ?, ip_address = ?";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sss", $userFingerprint, $today, $today);
+        $stmt->bind_param("sssss", $userFingerprint, $today, $ip, $today, $ip);
         $stmt->execute();
-        
-        $sql = "SELECT id, author, content, created_at as date, likes, dislikes, NULL as user_reaction 
+
+        $sql = "SELECT id, author, content, created_at as date, likes, dislikes, NULL as user_reaction
                 FROM comments_posts WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $comment_id);
         $stmt->execute();
         $result = $stmt->get_result();
         $comment = $result->fetch_assoc();
-        
+
         http_response_code(201);
         echo json_encode($comment);
     } else {
@@ -211,15 +242,15 @@ function handleReaction($conn, $commentId, $userFingerprint, $reactionType) {
     $stmt->bind_param("i", $commentId);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows === 0) {
         http_response_code(404);
         echo json_encode(['error' => 'Comment not found']);
         return;
     }
-    
+
     $conn->begin_transaction();
-    
+
     try {
         $sql = "SELECT reaction_type FROM comments_reactions WHERE comment_id = ? AND user_fingerprint = ?";
         $stmt = $conn->prepare($sql);
@@ -227,40 +258,40 @@ function handleReaction($conn, $commentId, $userFingerprint, $reactionType) {
         $stmt->execute();
         $result = $stmt->get_result();
         $currentReaction = $result->num_rows > 0 ? $result->fetch_assoc()['reaction_type'] : null;
-        
+
         if ($reactionType === 'none') {
             if ($currentReaction) {
                 $sql = "DELETE FROM comments_reactions WHERE comment_id = ? AND user_fingerprint = ?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("is", $commentId, $userFingerprint);
                 $stmt->execute();
-                
+
                 $field = $currentReaction === 'like' ? 'likes' : 'dislikes';
                 $sql = "UPDATE comments_posts SET $field = $field - 1 WHERE id = ?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("i", $commentId);
                 $stmt->execute();
             }
-        } 
+        }
         else {
             if ($currentReaction === null) {
                 $sql = "INSERT INTO comments_reactions (comment_id, user_fingerprint, reaction_type) VALUES (?, ?, ?)";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("iss", $commentId, $userFingerprint, $reactionType);
                 $stmt->execute();
-                
+
                 $field = $reactionType === 'like' ? 'likes' : 'dislikes';
                 $sql = "UPDATE comments_posts SET $field = $field + 1 WHERE id = ?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("i", $commentId);
                 $stmt->execute();
-            } 
+            }
             elseif ($currentReaction !== $reactionType) {
                 $sql = "UPDATE comments_reactions SET reaction_type = ? WHERE comment_id = ? AND user_fingerprint = ?";
                 $stmt = $conn->prepare($sql);
                 $stmt->bind_param("sis", $reactionType, $commentId, $userFingerprint);
                 $stmt->execute();
-                
+
                 $oldField = $currentReaction === 'like' ? 'likes' : 'dislikes';
                 $newField = $reactionType === 'like' ? 'likes' : 'dislikes';
                 $sql = "UPDATE comments_posts SET $oldField = $oldField - 1, $newField = $newField + 1 WHERE id = ?";
@@ -269,18 +300,18 @@ function handleReaction($conn, $commentId, $userFingerprint, $reactionType) {
                 $stmt->execute();
             }
         }
-        
+
         $conn->commit();
-        
-        $sql = "SELECT id, likes, dislikes, 
-                (SELECT reaction_type FROM comments_reactions WHERE comment_id = ? AND user_fingerprint = ?) as user_reaction 
+
+        $sql = "SELECT id, likes, dislikes,
+                (SELECT reaction_type FROM comments_reactions WHERE comment_id = ? AND user_fingerprint = ?) as user_reaction
                 FROM comments_posts WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("isi", $commentId, $userFingerprint, $commentId);
         $stmt->execute();
         $result = $stmt->get_result();
         $comment = $result->fetch_assoc();
-        
+
         echo json_encode($comment);
     } catch (Exception $e) {
         $conn->rollback();
