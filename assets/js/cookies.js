@@ -36,7 +36,7 @@ function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) {
-        return decodeURIComponent(parts.pop().split(';').shift());
+        return parts.pop().split(';').shift();
     }
     return null;
 }
@@ -53,7 +53,7 @@ function getAllCookies(prefix = '') {
         if (cookie.trim()) {
             const [name, value] = cookie.trim().split('=');
             if (!prefix || name.startsWith(prefix)) {
-                cookies[name] = decodeURIComponent(value);
+                cookies[name] = value;
             }
         }
     });
