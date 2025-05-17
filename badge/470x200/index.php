@@ -182,7 +182,6 @@ function serveErrorSvg($errorCode) {
 if (isset($_GET['repo'])) {
     $repoPath = $_GET['repo'];
     $useOriginalName = isset($_GET['oname']) && ($_GET['oname'] === 'true' || $_GET['oname'] === '1');
-    $customUser = isset($_GET['user']) ? $_GET['user'] : null;
 
     if (strpos($repoPath, '/') !== false) {
         list($owner, $repo) = explode('/', $repoPath, 2);
@@ -218,10 +217,6 @@ if (isset($_GET['repo'])) {
             }
         }
 
-        if ($customUser !== null) {
-            $displayUsername = $customUser;
-        }
-
         if ($certificateUsername == $owner) {
             $svgTemplate = file_get_contents('../../assets/img/470x200.svg');
             if ($svgTemplate === false) {
@@ -251,7 +246,6 @@ if (isset($_GET['repo'])) {
 } elseif (isset($_GET['website'])) {
     $websiteUrl = $_GET['website'];
     $useOriginalName = isset($_GET['oname']) && ($_GET['oname'] === 'true' || $_GET['oname'] === '1');
-    $customUser = isset($_GET['user']) ? $_GET['user'] : null;
 
     $certificatePath = 'noskid/certificate.png';
     $certificateContent = getWebsiteFileContent($websiteUrl, $certificatePath);
@@ -280,10 +274,6 @@ if (isset($_GET['repo'])) {
     } else {
         $domainName = extractDomainName($websiteUrl);
         $displayUsername = "$domainName's owner";
-    }
-
-    if ($customUser !== null) {
-        $displayUsername = $customUser;
     }
 
     $svgTemplate = file_get_contents('../../assets/img/470x200.svg');
