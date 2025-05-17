@@ -5,6 +5,8 @@ define('DB_HOST', 'dbhost');
 define('DB_USER', 'dbuser');
 define('DB_PASS', 'dbpwd');
 define('DB_NAME', 'dbname');
+define('CACHE_FILE', '../cache.txt'); //why using a database when we can use a file?
+define('CACHE_EXPIRY', 86400);
 
 function extractVerificationKeyFromPng($fileContent) {
     if (substr($fileContent, 0, 8) !== "\x89\x50\x4E\x47\x0D\x0A\x1A\x0A") {
@@ -102,7 +104,8 @@ function verifyCertificateKey($key) {
             'certificate_number' => $certNumber,
             'username' => $cert['name'],
             'percentage' => $cert['percentage'],
-            'creationDate' => $creationDate
+            'creationDate' => $creationDate,
+            'id' => $cert['id']
         ]
     ];
 }
@@ -179,30 +182,159 @@ function serveErrorSvg($errorCode) {
     exit;
 }
 
+function checkCache($url) {
+    if (!file_exists(CACHE_FILE)) {
+        return null;
+    }
+
+    $cacheData = file(CACHE_FILE, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $currentTime = time();
+
+    foreach ($cacheData as $line) {
+        $parts = explode('; ', $line);
+        if (count($parts) === 3) {
+            list($cachedUrl, $cachedDate, $certId) = $parts;
+
+            if ($cachedUrl === $url) {
+                if (($currentTime - intval($cachedDate)) < CACHE_EXPIRY) {
+                    return $certId;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return null;
+}
+
+function updateCache($url, $certId) {
+    $cacheData = [];
+    $newEntry = "$url; " . time() . "; $certId";
+
+    if (file_exists(CACHE_FILE)) {
+        $cacheData = file(CACHE_FILE, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        $cacheData = array_filter($cacheData, function($line) use ($url) {
+            return strpos($line, $url . '; ') !== 0;
+        });
+    }
+
+    $cacheData[] = $newEntry;
+
+    file_put_contents(CACHE_FILE, implode(PHP_EOL, $cacheData) . PHP_EOL);
+}
+
+function removeFromCache($url) {
+    if (!file_exists(CACHE_FILE)) {
+        return;
+    }
+
+    $cacheData = file(CACHE_FILE, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+    $cacheData = array_filter($cacheData, function($line) use ($url) {
+        return strpos($line, $url . '; ') !== 0;
+    });
+
+    file_put_contents(CACHE_FILE, implode(PHP_EOL, $cacheData) . PHP_EOL);
+}
+
+function getCertificateById($certId) {
+    $mysqli = new mysqli(DB_HOST, DB_USER, DB_PASS, DB_NAME);
+
+    if ($mysqli->connect_error) {
+        return [
+            'success' => false,
+            'message' => 'Database connection error'
+        ];
+    }
+
+    $stmt = $mysqli->prepare("SELECT c.id, c.name, c.percentage, c.created_at
+                            FROM cert c
+                            WHERE c.id = ?");
+
+    if (!$stmt) {
+        return [
+            'success' => false,
+            'message' => 'Database query preparation failed'
+        ];
+    }
+
+    $stmt->bind_param("i", $certId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows === 0) {
+        $stmt->close();
+        $mysqli->close();
+        return [
+            'success' => false,
+            'message' => 'Certificate not found'
+        ];
+    }
+
+    $cert = $result->fetch_assoc();
+    $stmt->close();
+    $mysqli->close();
+
+    $certNumber = str_pad($cert['id'], 5, '0', STR_PAD_LEFT);
+
+    return [
+        'success' => true,
+        'message' => 'Certificate retrieved from cache',
+        'data' => [
+            'certificate_number' => $certNumber,
+            'username' => $cert['name'],
+            'percentage' => $cert['percentage'],
+            'creationDate' => $cert['created_at'],
+            'id' => $cert['id']
+        ]
+    ];
+}
+
 if (isset($_GET['repo'])) {
     $repoPath = $_GET['repo'];
     $useOriginalName = isset($_GET['oname']) && ($_GET['oname'] === 'true' || $_GET['oname'] === '1');
 
     if (strpos($repoPath, '/') !== false) {
         list($owner, $repo) = explode('/', $repoPath, 2);
+        $cacheKey = "github:{$repoPath}";
 
-        $certificatePath = 'noskid/certificate.png';
-        $certificateContent = getGithubFileContent($owner, $certificatePath);
+        $cachedCertId = checkCache($cacheKey);
+        $verificationResult = null;
 
-        if ($certificateContent === null) {
-            serveErrorSvg('404');
-        }
+        if ($cachedCertId !== null && $cachedCertId !== false) {
+            $verificationResult = getCertificateById($cachedCertId);
+        } else {
+            $certificatePath = 'noskid/certificate.png';
+            $certificateContent = getGithubFileContent($owner, $certificatePath);
 
-        $verificationKey = extractVerificationKeyFromPng($certificateContent);
+            if ($certificateContent === null) {
+                if ($cachedCertId === false) {
+                    removeFromCache($cacheKey);
+                }
+                serveErrorSvg('404');
+            }
 
-        if ($verificationKey === null) {
-            serveErrorSvg('403');
-        }
+            $verificationKey = extractVerificationKeyFromPng($certificateContent);
 
-        $verificationResult = verifyCertificateKey($verificationKey);
+            if ($verificationKey === null) {
+                if ($cachedCertId === false) {
+                    removeFromCache($cacheKey);
+                }
+                serveErrorSvg('403');
+            }
 
-        if (!$verificationResult['success']) {
-            serveErrorSvg('403');
+            $verificationResult = verifyCertificateKey($verificationKey);
+
+            if (!$verificationResult['success']) {
+                if ($cachedCertId === false) {
+                    removeFromCache($cacheKey);
+                }
+                serveErrorSvg('403');
+            }
+
+            updateCache($cacheKey, $verificationResult['data']['id']);
         }
 
         $certificateUsername = $verificationResult['data']['username'];
@@ -217,8 +349,8 @@ if (isset($_GET['repo'])) {
             }
         }
 
-        if ($certificateUsername == $owner) {
-            $svgTemplate = file_get_contents('../../assets/img/1200x420.svg');
+        if ($certificateUsername == $owner || $cachedCertId !== null) {
+            $svgTemplate = file_get_contents('../../assets/img/1200x200.svg');
             if ($svgTemplate === false) {
                 serveErrorSvg('422');
             }
@@ -238,6 +370,7 @@ if (isset($_GET['repo'])) {
             echo $svgContent;
             exit;
         } else {
+            removeFromCache($cacheKey);
             serveErrorSvg('403');
         }
     } else {
@@ -246,24 +379,43 @@ if (isset($_GET['repo'])) {
 } elseif (isset($_GET['website'])) {
     $websiteUrl = $_GET['website'];
     $useOriginalName = isset($_GET['oname']) && ($_GET['oname'] === 'true' || $_GET['oname'] === '1');
+    $cacheKey = "website:{$websiteUrl}";
 
-    $certificatePath = 'noskid/certificate.png';
-    $certificateContent = getWebsiteFileContent($websiteUrl, $certificatePath);
+    $cachedCertId = checkCache($cacheKey);
+    $verificationResult = null;
 
-    if ($certificateContent === null) {
-        serveErrorSvg('404');
-    }
+    if ($cachedCertId !== null && $cachedCertId !== false) {
+        $verificationResult = getCertificateById($cachedCertId);
+    } else {
+        $certificatePath = 'noskid/certificate.png';
+        $certificateContent = getWebsiteFileContent($websiteUrl, $certificatePath);
 
-    $verificationKey = extractVerificationKeyFromPng($certificateContent);
+        if ($certificateContent === null) {
+            if ($cachedCertId === false) {
+                removeFromCache($cacheKey);
+            }
+            serveErrorSvg('404');
+        }
 
-    if ($verificationKey === null) {
-        serveErrorSvg('403');
-    }
+        $verificationKey = extractVerificationKeyFromPng($certificateContent);
 
-    $verificationResult = verifyCertificateKey($verificationKey);
+        if ($verificationKey === null) {
+            if ($cachedCertId === false) {
+                removeFromCache($cacheKey);
+            }
+            serveErrorSvg('403');
+        }
 
-    if (!$verificationResult['success']) {
-        serveErrorSvg('403');
+        $verificationResult = verifyCertificateKey($verificationKey);
+
+        if (!$verificationResult['success']) {
+            if ($cachedCertId === false) {
+                removeFromCache($cacheKey);
+            }
+            serveErrorSvg('403');
+        }
+
+        updateCache($cacheKey, $verificationResult['data']['id']);
     }
 
     $certificateUsername = $verificationResult['data']['username'];
@@ -276,7 +428,7 @@ if (isset($_GET['repo'])) {
         $displayUsername = "$domainName's owner";
     }
 
-    $svgTemplate = file_get_contents('../../assets/img/1200x420.svg');
+    $svgTemplate = file_get_contents('../../assets/img/1200x200.svg');
     if ($svgTemplate === false) {
         serveErrorSvg('422');
     }
