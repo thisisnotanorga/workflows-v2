@@ -350,7 +350,7 @@ if (isset($_GET['repo'])) {
         }
 
         if ($certificateUsername == $owner || $cachedCertId !== null) {
-            $svgTemplate = file_get_contents('../../assets/img/1200x200.svg');
+            $svgTemplate = file_get_contents('../../assets/img/1200x420.svg');
             if ($svgTemplate === false) {
                 serveErrorSvg('422');
             }
@@ -428,7 +428,7 @@ if (isset($_GET['repo'])) {
         $displayUsername = "$domainName's owner";
     }
 
-    $svgTemplate = file_get_contents('../../assets/img/1200x200.svg');
+    $svgTemplate = file_get_contents('../../assets/img/1200x420.svg');
     if ($svgTemplate === false) {
         serveErrorSvg('422');
     }
