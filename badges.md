@@ -102,7 +102,7 @@ If your badge fails to display properly, you may see one of these error SVGs:
 [![NoSkid Verification](https://noskid.today/badge/470x200/?repo=douxxtech/noskid.today)](https://noskid.today)
 
 `1200x420`
-[![NoSkid Verification](https://noskid.today/badge/1200x420/?repo=douxxtech/noskid.today)](https://noskid.today)
+[![NoSkid Verification](https://noskid.today/badge/1200x420/?repo=douxxtech/noskid.today&)](https://noskid.today)
 
 ## FAQ
 
