@@ -1,4 +1,4 @@
-# Noskid today - please don't talk when you don't know
+# No skid today - please don't talk when you don't know
 
 ![togp thing](https://togp.xyz?owner=douxxtech&repo=noskid.today&theme=json-dark-all&cache=false)
 
@@ -6,12 +6,11 @@ We dont like skids.
 
 A website based on [nohello.net](https://nohello.net), but heavily modified with rich features !
 
-> [!TIP]
+> [!NOTE]
 > New feature ! Noskid badges:  
 > Check the [badges.md](badges.md)  
 >  
-> [![NoSkid Verification](https://noskid.today/badge/100x30/?repo=douxxtech/noskid.today)](https://noskid.today)  
-
+> [![NoSkid Verification](https://noskid.today/badge/100x30/?repo=douxxtech/noskid.today)](https://noskid.today)
 
 
 ## Hosting this website
@@ -25,6 +24,10 @@ cd noskid.today
 php -S 0.0.0.0:80
 ```
 (or use something like apache with php-fpm)
+
+> [!TIP]
+> This website contains a lot (and really, a lot) of some hidden features, find them by looking at the console ! (Shift + ESC)  
+> E.G: use [Shift + T to open the comments !](https://noskid.today/#spawnCommentSystem)
 
 ## Yapyap
 Licensed under the [GPL-3.0 License](LICENSE)
