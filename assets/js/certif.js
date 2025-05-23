@@ -1,4 +1,4 @@
-//Certif.js | The certification manager
+//Certif.js | The certification manager with Turnstile protection
 
 const qa = [
   {
@@ -70,11 +70,11 @@ const qa = [
     "question": "A 12-year-old on Discord says 'I'm gonna DDoS you 😈'... should I be scared?",
     "options": [
       "Yes, I should unplug my router immediately",
-      "No, because most of them don’t even know what DDoS is",
+      "No, because most of them don't even know what DDoS is",
       "Yes, because he has my IP and can hack me",
       "I should move to another country just to be safe"
     ],
-    "answer": "No, because most of them don’t even know what DDoS is"
+    "answer": "No, because most of them don't even know what DDoS is"
   },
   {
     "question": "What does the ping command do?",
@@ -87,7 +87,7 @@ const qa = [
     "answer": "Tests network connectivity between two devices"
   },
   {
-    "question": "I found someone’s IP, what can I do with it? 😈",
+    "question": "I found someone's IP, what can I do with it? 😈",
     "options": [
       "Hack into their computer instantly",
       "Find their exact home address",
@@ -142,10 +142,11 @@ const qa = [
     "answer": "SFTP"
   }
 ];
+
 const quizForm = document.getElementById('quiz-form');
 const submitButton = quizForm.querySelector('.submit-button');
 const quizSection = document.querySelector(".quiz-section");
-
+const TURNSTILE_SITE_KEY = '0x4AAAAAABeZwqhQ3FcnOkEe';
 
 function createQuestions() {
   submitButton.style.display = 'flex';
@@ -198,7 +199,6 @@ function createQuestions() {
     log(`Question ${index + 1} added!`, 'success');
   });
 }
-
 
 function checkQuizResponses() {
   let score = 0;
@@ -260,34 +260,105 @@ function offerCertificate(score) {
   usernameInput.placeholder = 'Your name';
   usernameInput.className = 'input-text';
 
+  const turnstileContainer = document.createElement('div');
+  turnstileContainer.className = 'turnstile-container';
+  turnstileContainer.style.marginTop = '15px';
+  turnstileContainer.style.marginBottom = '15px';
+
   const downloadButton = document.createElement('button');
   downloadButton.textContent = 'Download';
   downloadButton.className = 'submit-button';
+  downloadButton.disabled = true; // disabled till Turnstile is validated
+
+  let turnstileWidgetId = null;
+  let turnstileToken = null;
+
+  function onTurnstileSuccess(token) {
+    turnstileToken = token;
+    downloadButton.disabled = false;
+    downloadButton.style.opacity = '1';
+    downloadButton.style.cursor = 'pointer';
+    log('Turnstile validated successfully!', 'success');
+  }
+
+  function onTurnstileError() {
+    turnstileToken = null;
+    downloadButton.disabled = true;
+    downloadButton.style.opacity = '0.5';
+    downloadButton.style.cursor = 'not-allowed';
+    log('Turnstile validation failed!', 'error');
+  }
+
+  function onTurnstileExpired() {
+    turnstileToken = null;
+    downloadButton.disabled = true;
+    downloadButton.style.opacity = '0.5';
+    downloadButton.style.cursor = 'not-allowed';
+    log('Turnstile token expired!', 'warning');
+  }
+
+  downloadButton.style.opacity = '0.5';
+  downloadButton.style.cursor = 'not-allowed';
+
+  // trunstile widget
+  if (typeof turnstile !== 'undefined') {
+    turnstileWidgetId = turnstile.render(turnstileContainer, {
+      sitekey: TURNSTILE_SITE_KEY,
+      callback: onTurnstileSuccess,
+      'error-callback': onTurnstileError,
+      'expired-callback': onTurnstileExpired,
+      theme: 'dark',
+      size: 'normal'
+    });
+  } else {
+    log('Turnstile not loaded, fallback mode', 'warning');
+    downloadButton.disabled = false;
+    downloadButton.style.opacity = '1';
+    downloadButton.style.cursor = 'pointer';
+  }
 
   downloadButton.addEventListener('click', () => {
-    const username = usernameInput.value;
-    if (username) {
-      window.location.href = `/api/downcert?percentage=${percentage.toFixed(2)}&name=${encodeURIComponent(username)}`;
-      log('Certificate downloaded!', 'success');
-      quizForm.innerHTML = `<p>✅ Certificate downloaded! Check if a certificate is valid with \'Shift + C\'</p>
+    const username = usernameInput.value.trim();
+    
+    if (!username) {
+      alert('Please enter a valid name.');
+      return;
+    }
+
+    if (typeof turnstile !== 'undefined' && !turnstileToken) {
+      alert('Please complete the security verification.');
+      return;
+    }
+
+    let downloadUrl = `/api/downcert?percentage=${percentage.toFixed(2)}&name=${encodeURIComponent(username)}`;
+    if (turnstileToken) {
+      downloadUrl += `&turnstile_token=${encodeURIComponent(turnstileToken)}`;
+    }
+
+    downloadButton.disabled = true;
+    downloadButton.textContent = 'Downloading...';
+
+    window.location.href = downloadUrl;
+    
+    log('Certificate download initiated!', 'success');
+    
+    setTimeout(() => {
+      quizForm.innerHTML = `<p>✅ Certificate downloaded! Check if a certificate is valid with 'Shift + C'</p>
           <br>
           <p>Show your hard work on your projects with the <a href="https://github.com/douxxtech/noskid.today/blob/main/badges.md" target="_blank">noskid badges</a> :]
           <hr>
           <p>If you like this website consider adding a star to <a href="https://github.com/douxxtech/noskid.today" target="_blank">the github</a> <3</p>`;
       certificateSection.style.display = 'none';
-    } else {
-      alert('Please enter a valid name.');
-    }
+    }, 2000);
   });
 
   certificateSection.appendChild(message);
   certificateSection.appendChild(usernameInput);
+  certificateSection.appendChild(turnstileContainer);
   certificateSection.appendChild(downloadButton);
   quizForm.appendChild(certificateSection);
-  log('Certificate section showed!', 'success');
+  log('Certificate section with Turnstile showed!', 'success');
 }
-
-
 
 function handleQuizDisplay() {
   if (window.innerWidth <= 768) {
@@ -303,7 +374,6 @@ function handleQuizDisplay() {
       submitButton.style.display = 'none';
       log('Quiz has already been taken.', 'warning')
     } else {
-
       createQuestions();
 
       quizForm.addEventListener('submit', (e) => {
@@ -316,9 +386,7 @@ function handleQuizDisplay() {
 
 handleQuizDisplay();
 
-
 // part to redo the quiz
-
 function redoQuiz(event) {
   event.preventDefault();
 
@@ -334,4 +402,3 @@ function redoQuiz(event) {
   createQuestions();
   log('Recreated questions!', 'success')
 }
-
