@@ -19,4 +19,8 @@ define('TURNSTILE_VERIFY_URL', 'https://challenges.cloudflare.com/turnstile/v0/s
 //for the badges cache, the file is in /badges/cache.txt
 define('CACHE_FILE', '../cache.txt');
 define('CACHE_EXPIRY', 86400);
+
+//maintenance togle pwd
+define('TOGGLE_PASSWORD', 'tglpwd');
+
 ?>

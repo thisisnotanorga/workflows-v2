@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8" />
+    <title>No Skid - Maintenance</title>
+    
+    <!-- Meta -->
+    <meta name="title" content="No Skid - Maintenance" />
+    <meta name="description" content="Site temporarily under maintenance" />
+    <meta name="author" content="douxx.tech" />
+    
+    <!-- Icons -->
+    <link rel="apple-touch-icon" href="https://noskid.today/assets/img/noskid-icon.png" />
+    <link rel="shortcut icon" href="https://noskid.today/assets/img/noskid-icon.png" type="image/x-icon" />
+    <link rel="icon" href="https://noskid.today/assets/img/noskid-icon.png" type="image/x-icon" />
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0f0f0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 500px;
+            padding: 2rem;
+        }
+
+        .logo {
+            margin-bottom: 3rem;
+        }
+
+        .logo h1 {
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: -1px;
+        }
+
+        .logo .no {
+            color: #cccccc;
+        }
+
+        .logo .skid {
+            color: #888888;
+            text-decoration: line-through;
+            text-decoration-color: #ff6b6b;
+            text-decoration-thickness: 3px;
+        }
+
+        .maintenance-content {
+            margin: 2rem 0;
+        }
+
+        .maintenance-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+
+        .maintenance-message {
+            font-size: 0.95rem;
+            color: #b0b0b0;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2rem 0;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #ff6b6b;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .footer {
+            margin-top: 3rem;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .footer a {
+            color: #f3a6a6;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .logo h1 {
+                font-size: 2.2rem;
+            }
+            
+            .maintenance-title {
+                font-size: 1.3rem;
+            }
+            
+            .container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>
+                <span class="no">no</span>
+                <span class="skid">skid</span>
+            </h1>
+        </div>
+        
+        <div class="maintenance-content">
+            <h2 class="maintenance-title">Site Under Maintenance</h2>
+            
+            <div class="status-indicator">
+                <div class="dot"></div>
+                <span>Temporarily Offline</span>
+            </div>
+            
+            <p class="maintenance-message">
+                We're currently performing scheduled maintenance to improve your experience.
+                <br>
+                The site will be back online shortly.
+            </p>
+        </div>
+        
+        <div class="footer">
+            Made by <a href="https://douxx.tech" target="_blank">douxx.tech</a>
+        </div>
+    </div>
+</body>
+</html>
