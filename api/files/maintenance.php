@@ -1,6 +1,6 @@
 <?php
 
-define('TOGGLE_PASSWORD', 'your_secure_password_here');
+require_once '../config.php';
 
 header('Content-Type: application/json');
 
