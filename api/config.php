@@ -16,7 +16,6 @@ define('DB_NAME', 'dbname');
 define('TURNSTILE_SECRET_KEY', 'turnstile_secret_key');
 define('TURNSTILE_VERIFY_URL', 'https://challenges.cloudflare.com/turnstile/v0/siteverify');
 
-
 //for the badges cache, the file is in /badges/cache.txt
 define('CACHE_FILE', '../cache.txt');
 define('CACHE_EXPIRY', 86400);
