@@ -1,0 +1,30 @@
+/*Notification.css | Little popups */
+
+.notification {
+    position: fixed;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 7777;
+    font-size: 14px;
+    max-width: 90vw;
+}
+
+.notification.show {
+    top: 20px;
+}
+
+.notification.hide {
+    top: -60px;
+    opacity: 0;
+}
+
+.notification:hover {
+    background: #444;
+}
