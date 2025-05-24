@@ -79,7 +79,7 @@ try {
     $providedPassword = $_GET['pwd'] ?? null;
     $currentStatus = getCurrentStatus($indexFile);
     
-    if (empty($providedPassword) || $providedPassword !== TOGGLE_PASSWORD) {
+    if (empty($providedPassword) || $providedPassword !== ETC_PWD) {
         $message = empty($providedPassword) 
             ? "Current site status"
             : "Invalid password - showing status only";

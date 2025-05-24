@@ -21,7 +21,7 @@ define('CACHE_FILE', '../cache.txt');
 define('CACHE_EXPIRY', 86400);
 
 //maintenance togle pwd
-define('TOGGLE_PASSWORD', 'tglpwd');
+define('ETC_PWD', 'tglpwd');
 
 //certificate questions
 $questions = [
