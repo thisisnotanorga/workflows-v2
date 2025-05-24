@@ -23,4 +23,24 @@ define('CACHE_EXPIRY', 86400);
 //maintenance togle pwd
 define('TOGGLE_PASSWORD', 'tglpwd');
 
+//certificate questions
+$questions = [
+    [
+        'question' => 'should i star noskid.today ?',
+        'answers' => [
+            'yes'
+        ],
+        'correct' => 0
+    ],
+    [
+        'question' => 'what if i dont want to star noskid.today ?',
+        'answers' => [
+            'you should still star noskid.today',
+            'you should not star noskid.today'
+        ],
+        'correct' => 0
+    ]
+];
+
+
 ?>
