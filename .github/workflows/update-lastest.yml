@@ -5,8 +5,9 @@ on:
     branches:
       - main
     paths:
-      - 'index.html'
+      - '**.html'
       - 'assets/**'
+      - 'term/**'
 
 jobs:
   update-version:
