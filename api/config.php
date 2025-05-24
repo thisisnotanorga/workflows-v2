@@ -20,8 +20,8 @@ define('TURNSTILE_VERIFY_URL', 'https://challenges.cloudflare.com/turnstile/v0/s
 define('CACHE_FILE', '../cache.txt');
 define('CACHE_EXPIRY', 86400);
 
-//maintenance togle pwd
-define('ETC_PWD', 'tglpwd');
+//maintenance toggle and lastest update pwd
+define('ETC_PWD', 'etcpwd');
 
 //certificate questions
 $questions = [

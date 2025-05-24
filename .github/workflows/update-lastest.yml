@@ -1,0 +1,71 @@
+name: Update Latest Version
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'assets/**'
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Get latest commit short hash
+      id: commit
+      run: |
+        COMMIT_SHORT=$(git rev-parse --short HEAD)
+        echo "short_hash=$COMMIT_SHORT" >> $GITHUB_OUTPUT
+        echo "Latest commit short hash: $COMMIT_SHORT"
+    
+    - name: Update version on API
+      id: update_api
+      run: |
+        COMMIT_HASH="${{ steps.commit.outputs.short_hash }}"
+        API_PASSWORD="${{ secrets.API_PASSWORD }}"
+        
+        echo "Updating version with commit: $COMMIT_HASH"
+        
+        RESPONSE=$(curl -s -w "\n%{http_code}" \
+          "https://noskid.today/api/lastest?${COMMIT_HASH}=${API_PASSWORD}")
+        
+        HTTP_BODY=$(echo "$RESPONSE" | head -n -1)
+        HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
+        
+        echo "HTTP Status: $HTTP_STATUS"
+        echo "Response Body: $HTTP_BODY"
+        
+        if [ "$HTTP_STATUS" = "200" ] && [ "$HTTP_BODY" = "OK" ]; then
+          echo "✅ Version updated successfully!"
+          echo "success=true" >> $GITHUB_OUTPUT
+        elif [ "$HTTP_STATUS" = "401" ] && [ "$HTTP_BODY" = "Forbidden" ]; then
+          echo "❌ Authentication failed - Forbidden"
+          echo "success=false" >> $GITHUB_OUTPUT
+          exit 1
+        elif [ "$HTTP_STATUS" = "500" ] && [ "$HTTP_BODY" = "NOT OK" ]; then
+          echo "❌ Server error - NOT OK"
+          echo "success=false" >> $GITHUB_OUTPUT
+          exit 1
+        else
+          echo "❌ Unexpected response: Status $HTTP_STATUS, Body: $HTTP_BODY"
+          echo "success=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+    
+    - name: Success notification
+      if: steps.update_api.outputs.success == 'true'
+      run: |
+        echo "🎉 Version ${{ steps.commit.outputs.short_hash }} has been successfully deployed!"
+    
+    - name: Failure notification
+      if: failure()
+      run: |
+        echo "💥 Failed to update version ${{ steps.commit.outputs.short_hash }}"
+        echo "Check the API response above for details."
