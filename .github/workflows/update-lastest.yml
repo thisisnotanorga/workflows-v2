@@ -42,6 +42,7 @@ jobs:
         
         echo "HTTP Status: $HTTP_STATUS"
         echo "Response Body: $HTTP_BODY"
+        echo "Response: $RESPONSE"
         
         if [ "$HTTP_STATUS" = "200" ] && [ "$HTTP_BODY" = "OK" ]; then
           echo "✅ Version updated successfully!"
