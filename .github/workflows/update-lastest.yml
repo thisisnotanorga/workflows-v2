@@ -34,7 +34,7 @@ jobs:
         
         echo "Updating version with commit: $COMMIT_HASH"
         
-        RESPONSE=$(curl -s -w "\n%{http_code}" \
+        RESPONSE=$(curl -sSL -w "\n%{http_code}" \
           --get \
           --data-urlencode "${COMMIT_HASH}=${API_PASSWORD}" \
           "https://noskid.today/api/lastest")
