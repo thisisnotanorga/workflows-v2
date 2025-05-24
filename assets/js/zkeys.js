@@ -94,10 +94,6 @@ const sequences = {
         action: toggleBoom,
         description: 'Activate boom mode'
     },
-    'cheat': {
-        action: autoCompleteQuiz,
-        description: 'Automatically complete the quiz'
-    },
     'downfall': {
         action: makeElementsFall,
         description: 'Makes all the elements of the website fall down'
