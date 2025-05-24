@@ -105,7 +105,7 @@ async function checkForUpdates() {
         const latestVersion = await response.text();
 
         if (storedVersion !== latestVersion) {
-            log('New version :' + latestVersion, 'warning');
+            log('New version: ' + latestVersion, 'warning');
 
             showUpdateNotification(latestVersion);
         } else {
