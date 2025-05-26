@@ -50,6 +50,11 @@ const keyBindings = [
         keys: ['Shift', 'T'],
         action: spawnCommentSystem,
         description: 'Tell us what you think about noskid !'
+    },
+    {
+        keys: ['Shift', 'K'],
+        action: showKonata,
+        description: 'Bailando bailando 🎵'
     }
 ];
 
