@@ -5,10 +5,11 @@ function spawnUpdate(version) {
         title: 'Update Available',
         width: 400,
         height: 250,
-        content: `<p>A new version of noskid is available: <strong>${version}</strong></p>
+        content: cs(`<p>A new version of noskid is available: <bold>${version}</bold></p>
                   <p>If you don't update, your user experience may be decreased. :]</p>
-                  <button id="download-update" class="btn btn-primary">Update resources</button>`,
-        statusText: 'If the button does not work, use the shortcut Ctrl + Shift + R to hard reload resources.',
+                  <h2>To update, hard refresh with <bold>Ctrl+Shift+R</bold> then, press this button</h5>
+
+                  <button id="download-update" class="btn btn-primary">Finish update</button>`),
         theme: 'dark',
         x: Math.round((window.innerWidth - 400) / 2),
         y: Math.round((window.innerHeight - 250) / 2)
@@ -100,13 +101,16 @@ async function checkForUpdates() {
 
         if (!response.ok) {
             log(`Error while checking for updates: ${response.statusText}`, 'error');
+            return;
         }
 
         const latestVersion = await response.text();
 
-        if (storedVersion !== latestVersion) {
+        if (storedVersion === undefined || storedVersion === null || storedVersion === '') {
+            localStorage.lastest = latestVersion;
+            log(`Initialized version to ${latestVersion}`, 'success');
+        } else if (storedVersion !== latestVersion) {
             log('New version: ' + latestVersion, 'warning');
-
             showUpdateNotification(latestVersion);
         } else {
             log(`We are up to date ! (${latestVersion})`, 'success');
@@ -114,7 +118,6 @@ async function checkForUpdates() {
 
     } catch (error) {
         log(`Error while checking for updates: ${error}`, 'error');
-
     }
 }
 
