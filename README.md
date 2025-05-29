@@ -7,8 +7,8 @@ We dont like skids.
 A website based on [nohello.net](https://nohello.net), but heavily modified with rich features !
 
 > [!NOTE]
-> New feature ! Noskid badges:  
-> Check the [badges.md](badges.md)  
+> New feature ! @is.notaskid.ong mails !:  
+> Check the [website](https://im.notaskid.ong) ! 
 >  
 > [![NoSkid Verification](https://noskid.today/badge/100x30/?repo=douxxtech/noskid.today)](https://noskid.today)
 
@@ -26,7 +26,7 @@ php -S 0.0.0.0:80
 (or use something like apache with php-fpm)
 
 > [!TIP]
-> This website contains a lot (and really, a lot) of some hidden features, find them by looking at the console ! (Shift + ESC)  
+> This website contains a lot (and really, a lot) of hidden features, find them by looking at the console ! (Shift + ESC)  
 > E.G: use [Shift + T to open the comments !](https://noskid.today/#spawnCommentSystem)
 
 ## Yapyap

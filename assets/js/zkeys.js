@@ -54,7 +54,7 @@ const keyBindings = [
     {
         keys: ['Shift', 'K'],
         action: showKonata,
-        description: 'Bailando bailando 🎵'
+        description: 'Bailando bailando'
     }
 ];
 
