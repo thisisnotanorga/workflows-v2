@@ -54,11 +54,13 @@ class NoSkidBuilder {
             minifiedSize: 0,
             filesProcessed: 0,
             assetsRenamed: 0,
+            assetsSkipped: 0,
             htmlFilesOptimized: 0
         };
 
         this.reservedKeywords = new Set(config.reservedKeywords);
         this.criticalScripts = new Set(config.criticalScripts);
+        this.excludedExtensions = new Set(config.excludedExtensions || []);
     }
 
     checkProjectRoot() {
@@ -124,6 +126,17 @@ class NoSkidBuilder {
         if (!url) return false;
         const lowerUrl = url.toLowerCase();
         return Array.from(this.criticalScripts).some(pattern => lowerUrl.includes(pattern));
+    }
+
+    shouldSkipExtension(filename) {
+        const ext = path.extname(filename).toLowerCase();
+        const isExcluded = this.excludedExtensions.has(ext);
+        
+        if (isExcluded) {
+            log(`Skipping file with excluded extension: ${filename} (${ext})`, 'info');
+        }
+        
+        return isExcluded;
     }
 
     copyFiles() {
@@ -371,6 +384,12 @@ class NoSkidBuilder {
                 }
             } else {
                 if (entry.name.endsWith('.js')) {
+                    continue;
+                }
+
+                // Check if this file extension should be excluded from renaming
+                if (this.shouldSkipExtension(entry.name)) {
+                    this.stats.assetsSkipped++;
                     continue;
                 }
 
@@ -623,6 +642,7 @@ class NoSkidBuilder {
         log(`HTML files optimized: ${this.stats.htmlFilesOptimized}`, 'info');
         log(`JS files processed: ${this.stats.filesProcessed}`, 'info');
         log(`Assets renamed: ${this.stats.assetsRenamed}`, 'info');
+        log(`Assets skipped: ${this.stats.assetsSkipped}`, 'info');
         log(`Variables renamed: ${this.variableMap.size}`, 'info');
         log(`Space saved: ${spaceSaved} bytes (${compressionRatio}%)`, 'info');
     }
