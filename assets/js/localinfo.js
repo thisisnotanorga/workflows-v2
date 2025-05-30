@@ -44,7 +44,7 @@ async function getIpInfo() {
             
         }
     } catch (error) {
-        log(`Failed to fetch ip infos: ${e}`, 'error')
+        log(`Failed to fetch ip infos: ${error}`, 'error')
     }
 }
 
