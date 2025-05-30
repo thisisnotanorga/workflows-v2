@@ -105,7 +105,7 @@ class NoSkidBuilder {
         log(`Created build directory: ${this.buildDir}`, 'success');
     }
 
-    minifyHTML(html) {
+    minifyHTML(tag, html) {
         let minified = html;
 
         minified = minified.replace(/<!--(?!\s*(?:\[if [^\]]+\]|<!|>))[\s\S]*?-->/g, '');
@@ -115,7 +115,9 @@ class NoSkidBuilder {
         minified = minified.replace(/\s{2,}/g, ' ');
         minified = minified.replace(/\s*(<\/?(?:html|head|body|title|meta|link|script|style|div|span|p|h[1-6]|ul|ol|li|nav|header|footer|main|section|article|aside)[^>]*>)\s*/gi, '$1');
 
-        return minified.trim();
+        let result = tag + '\n' + minified;
+
+        return result.trim();
     }
 
     isCriticalScript(url) {
@@ -132,7 +134,7 @@ class NoSkidBuilder {
         for (const file of rootFiles) {
             if (file.endsWith('.html')) {
                 const content = fs.readFileSync(file, 'utf8');
-                const optimized = this.minifyHTML(config.commentTag + '\n' + content);
+                const optimized = this.minifyHTML(config.commentTag, content);
                 fs.writeFileSync(path.join(this.buildDir, file), optimized);
                 this.stats.htmlFilesOptimized++;
                 log(`Optimized and copied: ${file}`, 'success');
@@ -653,5 +655,3 @@ if (require.main === module) {
         process.exit(1);
     });
 }
-
-module.exports = NoSkidBuilder;
