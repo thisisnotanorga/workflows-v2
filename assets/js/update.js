@@ -7,9 +7,8 @@ function spawnUpdate(version) {
         height: 250,
         content: cs(`<p>A new version of noskid is available: <bold>${version}</bold></p>
                   <p>If you don't update, your user experience may be decreased. :]</p>
-                  <h2>To update, hard refresh with <bold>Ctrl+Shift+R</bold> then, press this button</h5>
 
-                  <button id="download-update" class="btn btn-primary">Finish update</button>`),
+                  <button id="download-update" class="btn btn-primary">Update Noskid</button>`),
         theme: 'dark',
         x: Math.round((window.innerWidth - 400) / 2),
         y: Math.round((window.innerHeight - 250) / 2)

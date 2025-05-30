@@ -116,10 +116,39 @@ class ScriptLoader {
         }
     }
 
+    async getFileComment(src) {
+        if (src.startsWith('http') && !src.includes(window.location.hostname)) {
+            return null;
+        }
+        
+        try {
+            const response = await fetch(src);
+            if (!response.ok) return null;
+            
+            const content = await response.text();
+            const lines = content.split('\n');
+            const firstLine = lines[0].trim();
+            
+            if (firstLine.startsWith('//')) {
+                const comment = firstLine.substring(2).trim();
+                return comment;
+            }
+            
+            return null;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    getFileName(src) {
+        return src.split('/').pop().replace('.js', '');
+    }
+
     async loadScript(src) {
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
             if (document.querySelector(`script[src="${src}"]`)) {
-                log(`Already loaded: ${src}`, 'warning');
+                const fileName = this.getFileName(src);
+                log(`Already loaded: ${fileName}`, 'warning');
                 resolve();
                 return;
             }
@@ -130,16 +159,28 @@ class ScriptLoader {
             
             const startTime = performance.now();
 
-            script.onload = () => {
+            script.onload = async () => {
                 const endTime = performance.now();
                 const loadTime = (endTime - startTime).toFixed(2);
                 this.loadedCount++;
-                log(`Loaded: ${src} in ${loadTime}ms`, 'success');
+                
+                const comment = await this.getFileComment(src);
+                const fileName = this.getFileName(src);
+                
+                let displayMessage;
+                if (comment) {
+                    displayMessage = `Loaded: ${comment} in ${loadTime}ms`;
+                } else {
+                    displayMessage = `Loaded: ${fileName} in ${loadTime}ms`;
+                }
+                
+                log(displayMessage, 'success');
                 resolve(script);
             };
 
             script.onerror = () => {
-                reject(new Error(`Script load error: ${src}`));
+                const fileName = this.getFileName(src);
+                reject(new Error(`Script load error: ${fileName}`));
             };
 
             document.body.appendChild(script);

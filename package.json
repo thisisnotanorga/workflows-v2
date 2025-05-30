@@ -1,0 +1,8 @@
+{
+  "name": "noskid-builder",
+  "version": "1.0.0",
+  "description": "Custom build setup for noskid source",
+  "scripts": {
+    "build": "node build/builder.js"
+  }
+}
