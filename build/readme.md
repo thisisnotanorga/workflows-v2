@@ -18,6 +18,7 @@
    npm run build
    ```
 4. The build output will be located in a `build/prod-<timestamp>` directory.
+5. The changelog will be located in the `changelog.txt` at the root of the builded version
 
 You're now ready to deploy or customize the project further!
 
