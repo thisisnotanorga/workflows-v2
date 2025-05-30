@@ -1,0 +1,26 @@
+*
+
+# dont ignore build files, but ignore the build subdirs!build/
+!build/
+!build/*
+build/*/
+
+# dont ignore main files
+
+!assets/
+!term/
+!index.htmk
+!maintenance.html
+!favicon.ico
+
+# API
+!api/
+api/config.php
+!badges/
+
+# misc
+!LICENSE
+!/README.md
+!/package.json
+!/badges.md
+!/.gitignore
