@@ -914,15 +914,18 @@ class NoSkidBuilder {
             changeLogContent += '\n';
         }
 
-        if (this.changeLog.assets.renamed.length > 0) {
-            changeLogContent += 'ASSET RENAMES:\n';
-            changeLogContent += '-------------\n';
+        if (this.changeLog.assets.renamed.length > 0 || this.changeLog.jsFiles.minified.length > 0) {
+            changeLogContent += 'ASSET AND JAVASCRIPT RENAMES:\n';
+            changeLogContent += '----------------------------\n';
+
             this.changeLog.assets.renamed.forEach(asset => {
-                changeLogContent += `- ${asset.originalName} -> ${asset.newName}\n`;
-                changeLogContent += `  Path: ${asset.originalPath} -> ${asset.newPath}\n`;
-                changeLogContent += `  Extension: ${asset.extension}\n`;
-                changeLogContent += `  Renamed: ${asset.timestamp}\n`;
+                changeLogContent += `- [ASSET] ${asset.originalPath} -> ${asset.newPath}\n`;
             });
+
+            this.changeLog.jsFiles.minified.forEach(file => {
+                changeLogContent += `- [JS] ${file.filename} -> ${path.basename(file.filename)}\n`;
+            });
+
             changeLogContent += '\n';
         }
 
