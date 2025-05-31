@@ -153,7 +153,7 @@ class NoSkidBuilder {
         minified = minified.replace(/^\s+|\s+$/gm, '');
         minified = minified.replace(/\n\s*\n/g, '\n');
         minified = minified.replace(/\s{2,}/g, ' ');
-        minified = minified.replace(/\s*(<\/?(?:html|head|body|title|meta|link|script|style|div|span|p|h[1-6]|ul|ol|li|nav|header|footer|main|section|article|aside)[^>]*>)\s*/gi, '$1');
+        minified = minified.replace(/\s*(<\/?(?:html|head|body|title|meta|link|script|style|div|p|h[1-6]|ul|ol|li|nav|header|footer|main|section|article|aside)[^>]*>)\s*/gi, '$1');
 
         let result = tag + '\n' + minified;
 
