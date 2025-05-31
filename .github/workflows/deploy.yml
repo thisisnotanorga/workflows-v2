@@ -1,0 +1,139 @@
+name: Deploy NoSkid Production build
+
+on:
+  push:
+    paths:
+      - '**.html'
+      - 'assets/**'
+      - 'term/**'
+      - 'api/**'
+
+env:
+  NODE_VERSION: '18'
+
+jobs:
+  analyze-changes:
+    name: Analyze Changes
+    runs-on: ubuntu-latest
+    outputs:
+      api-only: ${{ steps.check.outputs.api-only }}
+      has-frontend: ${{ steps.check.outputs.has-frontend }}
+      changed-files: ${{ steps.check.outputs.changed-files }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 2
+    
+    - name: Analyze changed files
+      id: check
+      run: |
+        # Get list of changed files
+        CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep -E '\.(html|css|js)$|^(assets|term|api)/' || true)
+        echo "changed-files<<EOF" >> $GITHUB_OUTPUT
+        echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        
+        echo "📋 Changed files:"
+        echo "$CHANGED_FILES"
+        
+        # Check if only API files were changed
+        API_ONLY=true
+        HAS_FRONTEND=false
+        
+        while IFS= read -r file; do
+          if [[ -n "$file" ]]; then
+            if [[ ! "$file" =~ ^api/ ]]; then
+              API_ONLY=false
+              HAS_FRONTEND=true
+            fi
+          fi
+        done <<< "$CHANGED_FILES"
+        
+        echo "api-only=$API_ONLY" >> $GITHUB_OUTPUT
+        echo "has-frontend=$HAS_FRONTEND" >> $GITHUB_OUTPUT
+        
+        echo "[i] Analysis results:"
+        echo "   - API only: $API_ONLY"
+        echo "   - Has frontend changes: $HAS_FRONTEND"
+
+  build-and-deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    needs: analyze-changes
+    if: needs.analyze-changes.outputs.changed-files != ''
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+    
+    - name: Build NoSkid project
+      id: build
+      uses: ./.github/actions/build-noskid
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    
+    - name: Deploy to server
+      id: deploy
+      if: steps.build.outputs.build-success == 'true'
+      uses: ./.github/actions/deploy-ftp
+      with:
+        build-dir: ${{ steps.build.outputs.build-dir }}
+        ftp-server: ${{ secrets.FTP_SERVER }}
+        ftp-username: ${{ secrets.FTP_USERNAME }}
+        ftp-password: ${{ secrets.FTP_PASSWORD }}
+        ftp-server-dir: ${{ secrets.FTP_SERVER_DIR }}
+    
+    - name: Update API version
+      id: api-update
+      if: |
+        steps.build.outputs.build-success == 'true' && 
+        steps.deploy.outputs.deploy-success == 'true'
+      uses: ./.github/actions/update-api
+      with:
+        commit-hash: ${{ steps.build.outputs.commit-hash }}
+        api-password: ${{ secrets.API_PASSWORD }}
+        retry-count: '3'
+    
+    
+    - name: Success
+      if: |
+        steps.build.outputs.build-success == 'true' && 
+        steps.deploy.outputs.deploy-success == 'true' &&
+        steps.api-update.outputs.update-success == 'true'
+      run: |
+        echo "::notice title=Deployment Success::[OK] Deployment completed successfully!"
+        
+        if [ "${{ needs.analyze-changes.outputs.api-only }}" = "true" ]; then
+          echo "::notice title=API Only::[OK] API-only changes deployed successfully!"
+        else
+          echo "::notice title=Full Deploy::[OK] Version ${{ steps.build.outputs.commit-hash }} deployed successfully!"
+        fi
+      
+        
+        echo "[i] Deployment Summary:"
+        echo "   - Commit: ${{ steps.build.outputs.commit-hash }}"
+        echo "   - API Only: ${{ needs.analyze-changes.outputs.api-only }}"
+        echo "   - Build Success: ${{ steps.build.outputs.build-success }}"
+        echo "   - Deploy Success: ${{ steps.deploy.outputs.deploy-success }}"
+        echo "   - API Update: ${{ steps.api-update.outputs.update-success }}"
+    
+    - name: Failure
+      if: failure()
+      run: |
+        echo "::error title=Deployment Failed::Deployment failed!"
+        
+        if [ "${{ steps.build.outputs.build-success }}" != "true" ]; then
+          echo "::error title=Build Failed::❌ Build process failed"
+        elif [ "${{ steps.deploy.outputs.deploy-success }}" != "true" ]; then
+          echo "::error title=Deploy Failed::❌ FTP deployment failed"
+        elif [ "${{ steps.api-update.outputs.update-success }}" = "false" ]; then
+          echo "::error title=API Update Failed::❌ Failed to update API version"
+          echo "API Response: ${{ steps.api-update.outputs.response-body }}"
+          echo "HTTP Status: ${{ steps.api-update.outputs.http-status }}"
+        else
+          echo "::error title=Unknown Error::❌ Unknown deployment error"
+        fi
+        
+        echo "[i] Check the workflow logs above for detailed error information"

@@ -1,0 +1,99 @@
+# .github/actions/update-api/action.yml
+name: 'Update API Version'
+description: 'Update the API with the latest commit version'
+
+inputs:
+  commit-hash:
+    description: 'Commit hash to update'
+    required: true
+  api-password:
+    description: 'API password for authentication'
+    required: true
+  api-endpoint:
+    description: 'API endpoint URL'
+    required: false
+    default: 'https://noskid.today/api/lastest'
+  retry-count:
+    description: 'Number of retry attempts'
+    required: false
+    default: '3'
+
+outputs:
+  update-success:
+    description: 'Whether the API update was successful'
+    value: ${{ steps.update.outputs.success }}
+  response-body:
+    description: 'API response body'
+    value: ${{ steps.update.outputs.response-body }}
+  http-status:
+    description: 'HTTP status code'
+    value: ${{ steps.update.outputs.http-status }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Update API version
+      id: update
+      shell: bash
+      run: |
+        COMMIT_HASH="${{ inputs.commit-hash }}"
+        API_PASSWORD="${{ inputs.api-password }}"
+        API_ENDPOINT="${{ inputs.api-endpoint }}"
+        RETRY_COUNT="${{ inputs.retry-count }}"
+        
+        echo "🔄 Updating API version with commit: $COMMIT_HASH"
+        echo "🌐 API Endpoint: $API_ENDPOINT"
+        
+        # Function to make API call
+        make_api_call() {
+          curl -sSL -w "\n%{http_code}" \
+            --connect-timeout 30 \
+            --max-time 60 \
+            --get \
+            --data-urlencode "${COMMIT_HASH}=${API_PASSWORD}" \
+            "$API_ENDPOINT"
+        }
+        
+        # Retry logic
+        SUCCESS=false
+        for i in $(seq 1 $RETRY_COUNT); do
+          echo "🔄 Attempt $i/$RETRY_COUNT"
+          
+          RESPONSE=$(make_api_call)
+          HTTP_BODY=$(echo "$RESPONSE" | head -n -1)
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -n 1)
+          
+          echo "📊 HTTP Status: $HTTP_STATUS"
+          echo "📄 Response Body: $HTTP_BODY"
+          
+          # Set outputs
+          echo "response-body=$HTTP_BODY" >> $GITHUB_OUTPUT
+          echo "http-status=$HTTP_STATUS" >> $GITHUB_OUTPUT
+          
+          if [ "$HTTP_STATUS" = "200" ] && [ "$HTTP_BODY" = "OK" ]; then
+            echo "✅ Version updated successfully!"
+            echo "success=true" >> $GITHUB_OUTPUT
+            SUCCESS=true
+            break
+          elif [ "$HTTP_STATUS" = "401" ] && [ "$HTTP_BODY" = "Forbidden" ]; then
+            echo "❌ Authentication failed - Forbidden"
+            echo "success=false" >> $GITHUB_OUTPUT
+            exit 1
+          elif [ "$HTTP_STATUS" = "500" ] && [ "$HTTP_BODY" = "NOT OK" ]; then
+            echo "❌ Server error - NOT OK"
+            echo "success=false" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "⚠️ Unexpected response: Status $HTTP_STATUS, Body: $HTTP_BODY"
+            if [ $i -lt $RETRY_COUNT ]; then
+              echo "🔄 Retrying in 5 seconds..."
+              sleep 5
+            fi
+          fi
+        done
+        
+        if [ "$SUCCESS" = false ]; then
+          echo "❌ Failed to update API version after $RETRY_COUNT attempts"
+          echo "success=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi

@@ -1,0 +1,63 @@
+# .github/actions/build-noskid/action.yml
+name: 'Build NoSkid Project'
+description: 'Build and prepare NoSkid project for deployment'
+
+inputs:
+  node-version:
+    description: 'Node.js version to use'
+    required: false
+    default: '18'
+
+outputs:
+  build-success:
+    description: 'Whether the build was successful'
+    value: ${{ steps.build.outputs.success }}
+  build-dir:
+    description: 'Path to the build directory'
+    value: ${{ steps.find-build.outputs.build-dir }}
+  commit-hash:
+    description: 'Short commit hash'
+    value: ${{ steps.commit.outputs.short_hash }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+
+    
+    - name: Get commit hash
+      id: commit
+      shell: bash
+      run: |
+        COMMIT_SHORT=$(git rev-parse --short HEAD)
+        echo "short_hash=$COMMIT_SHORT" >> $GITHUB_OUTPUT
+        echo "Latest commit short hash: $COMMIT_SHORT"
+    
+    - name: Build project
+      id: build
+      shell: bash
+      run: |
+        echo "🔨 Starting NoSkid build process..."
+        if npm run build; then
+          echo "✅ Build completed successfully!"
+          echo "success=true" >> $GITHUB_OUTPUT
+        else
+          echo "❌ Build failed!"
+          echo "success=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+    
+    - name: Find build directory
+      id: find-build
+      shell: bash
+      run: |
+        BUILD_DIR=$(find build -name "prod-*" -type d | head -1)
+        if [ -z "$BUILD_DIR" ]; then
+          echo "❌ Build directory not found!"
+          exit 1
+        fi
+        echo "build-dir=$BUILD_DIR" >> $GITHUB_OUTPUT
+        echo "[i] Build directory: $BUILD_DIR"
