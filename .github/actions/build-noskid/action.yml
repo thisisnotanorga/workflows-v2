@@ -40,12 +40,12 @@ runs:
       id: build
       shell: bash
       run: |
-        echo "🔨 Starting NoSkid build process..."
+        echo "[i] Starting NoSkid build process..."
         if npm run build; then
-          echo "✅ Build completed successfully!"
+          echo "[OK] Build completed successfully!"
           echo "success=true" >> $GITHUB_OUTPUT
         else
-          echo "❌ Build failed!"
+          echo "[X] Build failed!"
           echo "success=false" >> $GITHUB_OUTPUT
           exit 1
         fi

@@ -188,6 +188,8 @@ class NoSkidBuilder {
         const rootFiles = fs.readdirSync('.');
 
         for (const file of rootFiles) {
+            const lowerFile = file.toLowerCase();
+
             if (file.endsWith('.html')) {
                 const originalContent = fs.readFileSync(file, 'utf8');
                 const optimized = this.minifyHTML(config.commentTag, originalContent);
@@ -208,6 +210,9 @@ class NoSkidBuilder {
                 fs.copyFileSync(file, path.join(this.buildDir, file));
                 this.changeLog.htmlFiles.processed.push(file);
                 log(`Copied: ${file}`, 'success');
+            } else if (lowerFile === 'license') {
+                fs.copyFileSync(file, path.join(this.buildDir, file));
+                log(`Copied: ${file}`, 'success');
             }
         }
 
@@ -219,6 +224,7 @@ class NoSkidBuilder {
             }
         }
     }
+
 
     copyDir(src, dest) {
         if (!fs.existsSync(dest)) {
@@ -790,7 +796,7 @@ class NoSkidBuilder {
         const changeLogPath = this.writeChangeLog();
 
         log(`Change log written to: ${changeLogPath}`, 'success');
-        
+
 
         log(`Build completed successfully in ${duration}s!`, 'success');
         log(`Output directory: ${this.buildDir}`, 'info');

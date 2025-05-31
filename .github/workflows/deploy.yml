@@ -29,16 +29,14 @@ jobs:
     - name: Analyze changed files
       id: check
       run: |
-        # Get list of changed files
         CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep -E '\.(html|css|js)$|^(assets|term|api)/' || true)
         echo "changed-files<<EOF" >> $GITHUB_OUTPUT
         echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
         echo "EOF" >> $GITHUB_OUTPUT
         
-        echo "📋 Changed files:"
+        echo "[i] Changed files:"
         echo "$CHANGED_FILES"
         
-        # Check if only API files were changed
         API_ONLY=true
         HAS_FRONTEND=false
         
