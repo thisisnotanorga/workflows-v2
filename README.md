@@ -34,7 +34,7 @@ php -S 0.0.0.0:80
 > E.G: use [Shift + T to open the comments !](https://noskid.today/#spawnCommentSystem)
 
 ## Yapyap
-Licensed under the [GPL-3.0 License](LICENSE)
+Licensed under the [NSDv1.0 License](LICENSE)
 
 Thanks to all the [contributors](https://github.com/douxxtech/noskid.today/graphs/contributors) <3
 
