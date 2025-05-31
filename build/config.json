@@ -42,6 +42,7 @@
     "percentage",
     "creationDate",
     "country",
-    "countryCode"
+    "countryCode",
+    "notification"
   ]
 }
