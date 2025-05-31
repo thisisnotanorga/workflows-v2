@@ -787,7 +787,10 @@ class NoSkidBuilder {
         const duration = ((endTime - startTime) / 1000).toFixed(2);
         this.changeLog.buildInfo.duration = parseFloat(duration);
 
-        this.writeChangeLog();
+        const changeLogPath = this.writeChangeLog();
+
+        log(`Change log written to: ${changeLogPath}`, 'success');
+        
 
         log(`Build completed successfully in ${duration}s!`, 'success');
         log(`Output directory: ${this.buildDir}`, 'info');
@@ -803,6 +806,7 @@ class NoSkidBuilder {
         log(`Variables renamed: ${this.variableMap.size}`, 'info');
         log(`Space saved: ${spaceSaved} bytes (${compressionRatio}%)`, 'info');
     }
+
 
     writeChangeLog() {
         const changeLogPath = path.join(this.buildDir, 'changelog.txt');
@@ -996,7 +1000,7 @@ class NoSkidBuilder {
         changeLogContent += '====================================\n';
 
         fs.writeFileSync(changeLogPath, changeLogContent);
-        log(`Change log written to: ${changeLogPath}`, 'success');
+        return changeLogPath;
     }
 }
 
