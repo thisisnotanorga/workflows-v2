@@ -41,10 +41,8 @@ runs:
         BUILD_DIR="${{ inputs.build-dir }}"
         echo "[i] Preparing files from: $BUILD_DIR"
         
-        # Create upload directory
         mkdir -p upload
         
-        # Copy all files except api/config.php and text files
         rsync -av \
           --exclude="api/config.php" \
           --exclude="*.txt" \
@@ -58,7 +56,6 @@ runs:
         TOTAL_FILES=$(find upload -type f | wc -l)
         echo "[i] Total files to upload: $TOTAL_FILES"
         
-        # Calculate total size
         TOTAL_SIZE=$(du -sh upload | cut -f1)
         echo "[i] Total upload size: $TOTAL_SIZE"
     
@@ -69,22 +66,19 @@ runs:
         BUILD_DIR="${{ inputs.build-dir }}"
         echo "[i] Creating lastest.zip archive from: $BUILD_DIR"
         
-        # Create the zip file in the upload directory
         cd "$BUILD_DIR"
-        zip -r ../upload/lastest.zip . \
+        zip -r lastest.zip . \
           -x "api/config.php" \
           -x "*.txt" \
           -x "*.md" \
           -x "*.log" \
           -x "changelog.txt"
         
-        # Get zip file info
-        ZIP_SIZE=$(du -sh ../upload/lastest.zip | cut -f1)
+        ZIP_SIZE=$(du -sh lastest.zip | cut -f1)
         echo "[i] Created lastest.zip (Size: $ZIP_SIZE)"
         
-        # Verify zip contents
         echo "[i] Zip file contents preview:"
-        unzip -l ../upload/lastest.zip | head -20
+        unzip -l lastest.zip | head -20
     
     - name: Deploy to server via FTP
       id: deploy
