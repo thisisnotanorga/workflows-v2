@@ -22,10 +22,6 @@ inputs:
     description: 'Additional exclude patterns (newline separated)'
     required: false
     default: ''
-  create-zip:
-    description: 'Whether to create a lastest.zip file'
-    required: false
-    default: 'true'
 
 outputs:
   deploy-success:
@@ -48,37 +44,39 @@ runs:
           --exclude="*.txt" \
           --exclude="*.md" \
           --exclude="*.log" \
-          --exclude="changelog.txt" \
+          --include="changelog.txt" \
           "$BUILD_DIR/" upload/
         
         echo "[i] Files prepared for upload:"
         find upload -type f | head -20
         TOTAL_FILES=$(find upload -type f | wc -l)
         echo "[i] Total files to upload: $TOTAL_FILES"
-        
-        TOTAL_SIZE=$(du -sh upload | cut -f1)
-        echo "[i] Total upload size: $TOTAL_SIZE"
     
-    - name: Create lastest.zip archive
-      if: inputs.create-zip == 'true'
+    - name: Create latest.zip archive
       shell: bash
       run: |
         BUILD_DIR="${{ inputs.build-dir }}"
-        echo "[i] Creating lastest.zip archive from: $BUILD_DIR"
+        echo "[i] Creating latest.zip archive from: $BUILD_DIR"
         
-        cd "$BUILD_DIR"
-        zip -r lastest.zip . \
-          -x "api/config.php" \
-          -x "*.txt" \
-          -x "*.md" \
-          -x "*.log" \
-          -x "changelog.txt"
+        cd "upload/"
+        zip -r latest.zip . \
+          -x "latest.zip"
         
-        ZIP_SIZE=$(du -sh lastest.zip | cut -f1)
-        echo "[i] Created lastest.zip (Size: $ZIP_SIZE)"
+        ZIP_SIZE=$(du -sh latest.zip | cut -f1)
+        echo "[i] Created latest.zip in $BUILD_DIR (Size: $ZIP_SIZE)"
+      
+    
+    - name: Final upload summary
+      shell: bash
+      run: |
+        echo "[i] Final upload summary:"
+        find upload -type f | head -20
+        TOTAL_FILES=$(find upload -type f | wc -l)
+        echo "[i] Total files to upload: $TOTAL_FILES"
         
-        echo "[i] Zip file contents preview:"
-        unzip -l lastest.zip | head -20
+        # Calculate total size including zip
+        TOTAL_SIZE=$(du -sh upload | cut -f1)
+        echo "[i] Total upload size: $TOTAL_SIZE"
     
     - name: Deploy to server via FTP
       id: deploy
@@ -103,7 +101,5 @@ runs:
       shell: bash
       run: |
         echo "[OK] FTP deployment completed successfully!"
-        if [ "${{ inputs.create-zip }}" = "true" ]; then
-          echo "[OK] lastest.zip archive uploaded to server root!"
-        fi
+        echo "[OK] latest.zip archive has been uploaded to server root"
         echo "success=true" >> $GITHUB_OUTPUT
