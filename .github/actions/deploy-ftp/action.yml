@@ -22,6 +22,10 @@ inputs:
     description: 'Additional exclude patterns (newline separated)'
     required: false
     default: ''
+  create-zip:
+    description: 'Whether to create a lastest.zip file'
+    required: false
+    default: 'true'
 
 outputs:
   deploy-success:
@@ -58,6 +62,30 @@ runs:
         TOTAL_SIZE=$(du -sh upload | cut -f1)
         echo "[i] Total upload size: $TOTAL_SIZE"
     
+    - name: Create lastest.zip archive
+      if: inputs.create-zip == 'true'
+      shell: bash
+      run: |
+        BUILD_DIR="${{ inputs.build-dir }}"
+        echo "[i] Creating lastest.zip archive from: $BUILD_DIR"
+        
+        # Create the zip file in the upload directory
+        cd "$BUILD_DIR"
+        zip -r ../upload/lastest.zip . \
+          -x "api/config.php" \
+          -x "*.txt" \
+          -x "*.md" \
+          -x "*.log" \
+          -x "changelog.txt"
+        
+        # Get zip file info
+        ZIP_SIZE=$(du -sh ../upload/lastest.zip | cut -f1)
+        echo "[i] Created lastest.zip (Size: $ZIP_SIZE)"
+        
+        # Verify zip contents
+        echo "[i] Zip file contents preview:"
+        unzip -l ../upload/lastest.zip | head -20
+    
     - name: Deploy to server via FTP
       id: deploy
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
@@ -81,4 +109,7 @@ runs:
       shell: bash
       run: |
         echo "[OK] FTP deployment completed successfully!"
+        if [ "${{ inputs.create-zip }}" = "true" ]; then
+          echo "[OK] lastest.zip archive uploaded to server root!"
+        fi
         echo "success=true" >> $GITHUB_OUTPUT
