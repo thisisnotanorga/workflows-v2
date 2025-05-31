@@ -17,3 +17,4 @@ function againAndAgain() {
 
     log('Noskid window created, but why?', 'success');
 }
+ 
