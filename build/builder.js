@@ -96,6 +96,7 @@ class NoSkidBuilder {
         this.reservedKeywords = new Set(config.reservedKeywords);
         this.criticalScripts = new Set(config.criticalScripts);
         this.excludedExtensions = new Set(config.excludedExtensions || []);
+        this.preservedVariables = new Set(config.preservedVariables || []);
     }
 
     checkProjectRoot() {
@@ -168,7 +169,7 @@ class NoSkidBuilder {
     shouldSkipExtension(filename) {
         const ext = path.extname(filename).toLowerCase();
         const isExcluded = this.excludedExtensions.has(ext);
-        
+
         if (isExcluded) {
             log(`Skipping file with excluded extension: ${filename} (${ext})`, 'info');
             this.changeLog.assets.skipped.push({
@@ -177,7 +178,7 @@ class NoSkidBuilder {
                 timestamp: new Date().toISOString()
             });
         }
-        
+
         return isExcluded;
     }
 
@@ -191,7 +192,7 @@ class NoSkidBuilder {
                 const originalContent = fs.readFileSync(file, 'utf8');
                 const optimized = this.minifyHTML(config.commentTag, originalContent);
                 fs.writeFileSync(path.join(this.buildDir, file), optimized);
-                
+
                 this.stats.htmlFilesOptimized++;
                 this.changeLog.htmlFiles.processed.push(file);
                 this.changeLog.htmlFiles.optimized.push({
@@ -201,7 +202,7 @@ class NoSkidBuilder {
                     spaceSaved: originalContent.length - optimized.length,
                     compressionRatio: ((originalContent.length - optimized.length) / originalContent.length * 100).toFixed(2)
                 });
-                
+
                 log(`Optimized and copied: ${file}`, 'success');
             } else if (file.endsWith('.ico')) {
                 fs.copyFileSync(file, path.join(this.buildDir, file));
@@ -414,7 +415,8 @@ class NoSkidBuilder {
             ];
 
             const shouldSkip = skipPatterns.some(pattern => pattern.test(varName)) ||
-                this.reservedKeywords.has(varName);
+                this.reservedKeywords.has(varName) ||
+                this.preservedVariables.has(varName);
 
             if (shouldSkip) {
                 this.changeLog.variables.preserved.push({
@@ -491,7 +493,6 @@ class NoSkidBuilder {
                     continue;
                 }
 
-                // Check if this file extension should be excluded from renaming
                 if (this.shouldSkipExtension(entry.name)) {
                     this.stats.assetsSkipped++;
                     continue;
@@ -750,7 +751,7 @@ class NoSkidBuilder {
 
         fs.writeFileSync(indexPath, content);
         log(`Updated index.html with new loader name: ${newLoaderName}`, 'success');
-        
+
         this.changeLog.references.updated.push({
             file: 'index.html',
             references: [{
@@ -806,11 +807,11 @@ class NoSkidBuilder {
     writeChangeLog() {
         const changeLogPath = path.join(this.buildDir, 'changelog.txt');
         let changeLogContent = '';
-        
+
         changeLogContent += '====================================\n';
         changeLogContent += '       NOSKID BUILD CHANGELOG\n';
         changeLogContent += '====================================\n\n';
-        
+
         changeLogContent += 'BUILD INFORMATION:\n';
         changeLogContent += '-----------------\n';
         changeLogContent += `Build Timestamp: ${this.changeLog.buildInfo.timestamp}\n`;
@@ -822,7 +823,7 @@ class NoSkidBuilder {
         const spaceSaved = this.stats.originalSize - this.stats.minifiedSize;
         const compressionRatio = this.stats.originalSize > 0 ?
             ((spaceSaved / this.stats.originalSize) * 100).toFixed(1) : '0';
-        
+
         changeLogContent += `HTML Files Optimized: ${this.stats.htmlFilesOptimized}\n`;
         changeLogContent += `JavaScript Files Processed: ${this.stats.filesProcessed}\n`;
         changeLogContent += `Assets Renamed: ${this.stats.assetsRenamed}\n`;

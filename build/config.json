@@ -31,5 +31,17 @@
     ".ico",
     ".json"
   ],
-  "commentTag": "<!--\nThis incredible website has been made by douxx.tech !\nnoskid.today is a DPIP.lol project.\nSource is avalible at github.com/douxxtech/noskid.today !\n\ninvaders must die ;)\n-->"
+  "commentTag": "<!--\nThis incredible website has been made by douxx.tech !\nnoskid.today is a DPIP.lol project.\nSource is avalible at github.com/douxxtech/noskid.today !\n\ninvaders must die ;)\n-->",
+  "preservedVariables": [
+    "username",
+    "success",
+    "message",
+    "data",
+    "certificate_number",
+    "username",
+    "percentage",
+    "creationDate",
+    "country",
+    "countryCode"
+  ]
 }
