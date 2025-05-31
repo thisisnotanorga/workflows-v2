@@ -31,7 +31,7 @@
     ".ico",
     ".json"
   ],
-  "commentTag": "<!--\nThis incredible website has been made by douxx.tech !\nnoskid.today is a DPIP.lol project.\nSource is avalible at github.com/douxxtech/noskid.today !\n\ninvaders must die ;)\n-->",
+  "commentTag": "<!--\nThis incredible website has been made by douxx.tech !\nnoskid.today is a DPIP.lol project.\nSource is avalible at github.com/douxxtech/noskid.today !\n\ninvaders must die ;)\n\nCopyright (C) 2025 Douxx.tech <douxx@douxx.tech>\n\nThis work is licensed under the NSD License v1.0.\nYou may obtain a copy of the License at: https://douxx.tech/NSD\n-->",
   "preservedVariables": [
     "username",
     "success",
