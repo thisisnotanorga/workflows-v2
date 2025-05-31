@@ -14,6 +14,10 @@ A website based on [nohello.net](https://nohello.net), but heavily modified with
 
 
 ## Hosting this website
+> [!TIP]
+> To ensure high-quality production content, we recommend building the website from source before deploying it to a web server.
+> > Check out the [build README](build/readme.md) for detailed instructions.
+
 It's a php-dependent site, exept if you dont want to use the API (that would be sad).  
 You also need to install the package `librsvg2-bin` to convert SVG into PNG, and php must have the exec() function allowed.
 
