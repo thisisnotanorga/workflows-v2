@@ -5,7 +5,7 @@ const path = require('path');
 const { execSync, spawn } = require('child_process');
 const sharp = require('sharp');
 
-const ASCII_CHARS = ' .:-=+*#%@'; //lighter to darker characters 
+const ASCII_CHARS = '.:-=+*#%@&'; //lighter to darker characters
 
 function log(message, type = 'info') {
     const timestamp = new Date().toLocaleTimeString();
@@ -152,9 +152,8 @@ class VideoToAscii {
             }
         }
 
-        // Create metadata JSON
         const metadata = {
-            version: "1.0",
+            version: "1.1",
             generatedAt: new Date().toISOString(),
             video: {
                 sourcePath: path.resolve(this.videoPath),
@@ -176,7 +175,7 @@ class VideoToAscii {
                 charset: ASCII_CHARS
             },
             playback: {
-                frameDuration: 1000 / this.fps, // milliseconds per frame
+                frameDuration: 1000 / this.fps,
                 totalDurationMs: (frameCount / this.fps) * 1000
             }
         };
@@ -184,7 +183,6 @@ class VideoToAscii {
         const outputFileName = 'ascii_movie.txt';
         const outputPath = path.join(this.outputDir, outputFileName);
         
-        // Write JSON metadata on first line, followed by ASCII content
         const finalContent = JSON.stringify(metadata) + '\n' + fullAsciiMovie;
         fs.writeFileSync(outputPath, finalContent, 'utf8');
 
