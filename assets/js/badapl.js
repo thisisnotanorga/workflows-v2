@@ -1,5 +1,4 @@
 //Badapl.js | Logs bad apple in the dev console on screen size change (prob cuz we went in the console)
-
 async function playBadApl(event) {
   event.preventDefault();
 
@@ -34,10 +33,12 @@ async function playBadApl(event) {
 
     let currentFrame = 0;
     let startTime = null;
+    let playbackInterval = null;
 
     function displayFrame() {
       if (currentFrame >= validFrames.length) {
         log('BadApl console playback finished', 'success');
+        if (playbackInterval) clearInterval(playbackInterval);
         return;
       }
 
@@ -49,20 +50,35 @@ async function playBadApl(event) {
       currentFrame++;
     }
 
-    audio.play().catch(err => log('Audio playback failed: ' + err, 'error'));
+    await new Promise((resolve, reject) => {
+      const playPromise = audio.play();
+      
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setTimeout(resolve, 100);
+          })
+          .catch(err => {
+            log('Audio playback failed: ' + err, 'error');
+            resolve();
+          });
+      } else {
+        setTimeout(resolve, 200);
+      }
+    });
+
     startTime = Date.now();
     displayFrame();
 
-    const playbackInterval = setInterval(() => {
+    playbackInterval = setInterval(() => {
       displayFrame();
-      if (currentFrame >= validFrames.length) {
-        clearInterval(playbackInterval);
-      }
     }, frameDuration);
 
     return {
       stop: () => {
-        clearInterval(playbackInterval);
+        if (playbackInterval) clearInterval(playbackInterval);
+        audio.pause();
+        audio.currentTime = 0;
         log('Console BadApl Stopped', 'success');
       },
       metadata: metadata,
@@ -74,7 +90,6 @@ async function playBadApl(event) {
     return null;
   }
 }
-
 
 window.addEventListener('resize', (event) => {
     playBadApl(event);
