@@ -29,6 +29,7 @@ class ScriptLoader {
             'https://challenges.cloudflare.com/turnstile/v0/api.js',
             'assets/js/again.js',
             'assets/js/awesome.js',
+            'assets/js/badapl.js',
             'assets/js/boom.js',
             'assets/js/browser.js',
             'assets/js/certif.js',

@@ -8,8 +8,9 @@ build/*/
 # dont ignore main files
 
 !assets/
+!assets/**
 !term/
-!index.htmk
+!index.html
 !maintenance.html
 !favicon.ico
 
@@ -26,3 +27,5 @@ api/config.php
 !/.gitignore
 !.github/
 !.github/**
+!misc/
+!misc/**
