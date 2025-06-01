@@ -23,6 +23,15 @@ async function playBadApl(event) {
     log(`Duration: ${metadata.playback.totalDurationMs / 1000}s`, 'success');
     log(`FPS: ${metadata.ascii.fps}`, 'success');
 
+    console.clear();
+    console.log('%c⚠️ EPILEPSY WARNING ⚠️', 'color: red; font-size: 24px; font-weight: bold;');
+    console.log('%cThis animation contains rapidly flashing images', 'color: orange; font-size: 16px;');
+    console.log('%cIf you have epilepsy or are sensitive to flashing lights,', 'color: orange; font-size: 16px;');
+    console.log('%cplease close this console now.', 'color: orange; font-size: 16px;');
+    console.log('%cAnimation will start in 5 seconds...', 'color: yellow; font-size: 14px;');
+    
+    await new Promise(resolve => setTimeout(resolve, 5000));
+
     const frameDuration = metadata.playback.frameDuration || (1000 / metadata.ascii.fps);
     const audio = new Audio('assets/audio/ba.mp3');
 
