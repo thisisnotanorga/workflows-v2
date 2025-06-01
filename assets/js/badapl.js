@@ -50,6 +50,10 @@ async function playBadApl(event) {
       
       currentFrame++;
     }
+
+    const audio = new Audio('assets/audio/ba.mp3');
+    audio.play().catch(err => log('Audio playback failed: ' + err, 'error'));
+
     
     displayFrame();
     
