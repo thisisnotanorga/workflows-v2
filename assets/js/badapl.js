@@ -29,7 +29,7 @@ async function playBadApl(event) {
     console.log('%cIf you have epilepsy or are sensitive to flashing lights,', 'color: orange; font-size: 16px;');
     console.log('%cplease close this console now.', 'color: orange; font-size: 16px;');
     console.log('%cAnimation will start in 5 seconds...', 'color: yellow; font-size: 14px;');
-    
+
     await new Promise(resolve => setTimeout(resolve, 5000));
 
     const frameDuration = metadata.playback.frameDuration || (1000 / metadata.ascii.fps);
@@ -63,7 +63,7 @@ async function playBadApl(event) {
 
     await new Promise((resolve, reject) => {
       const playPromise = audio.play();
-      
+
       if (playPromise !== undefined) {
         playPromise
           .then(() => {
@@ -103,5 +103,27 @@ async function playBadApl(event) {
 }
 
 window.addEventListener('resize', (event) => {
-    playBadApl(event);
+  playBadApl(event);
 });
+
+
+function isMobileDevice() { //thanks to to claude ngl
+  const userAgent = navigator.userAgent.toLowerCase();
+  const mobileKeywords = ['mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry', 'windows phone'];
+  const isMobileUA = mobileKeywords.some(keyword => userAgent.includes(keyword));
+
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const isSmallScreen = window.innerWidth <= 1024;
+
+  const hasMobileFeatures = typeof window.orientation !== 'undefined' ||
+    /Mobi|Android/i.test(navigator.userAgent);
+
+  return isMobileUA || (isTouchDevice && isSmallScreen) || hasMobileFeatures;
+}
+
+if (!isMobileDevice()) {
+  window.addEventListener('resize', (event) => {
+    playBadApl(event);
+  }); $
+  console.log('BadApple resize trigger enabled (Desktop detected)');
+}
