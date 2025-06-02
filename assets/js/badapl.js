@@ -1,6 +1,5 @@
-//Badapl.js | Logs bad apple in the dev console on screen size change (prob cuz we went in the console)
-async function playBadApl(event) {
-  event.preventDefault();
+//Badapl.js | Logs bad apple in the dev console when devtools opens
+async function playBadApl() {
 
   try {
     const response = await fetch('assets/vids/ba.tmov');
@@ -102,12 +101,7 @@ async function playBadApl(event) {
   }
 }
 
-window.addEventListener('resize', (event) => {
-  playBadApl(event);
-});
-
-
-function isMobileDevice() { //thanks to to claude ngl
+function isMobileDevice() { //thanks to claude ngl
   const userAgent = navigator.userAgent.toLowerCase();
   const mobileKeywords = ['mobile', 'android', 'iphone', 'ipad', 'ipod', 'blackberry', 'windows phone'];
   const isMobileUA = mobileKeywords.some(keyword => userAgent.includes(keyword));
@@ -122,8 +116,60 @@ function isMobileDevice() { //thanks to to claude ngl
 }
 
 if (!isMobileDevice()) {
-  window.addEventListener('resize', (event) => {
-    playBadApl(event);
-  }); $
-  console.log('BadApple resize trigger enabled (Desktop detected)');
+  let initialOuterHeight = window.outerHeight;
+  let initialInnerHeight = window.innerHeight;
+  let lastTriggered = 0;
+
+  function detectDevtools() {
+    const currentOuterHeight = window.outerHeight;
+    const currentInnerHeight = window.innerHeight;
+    
+    const outerDiff = Math.abs(currentOuterHeight - initialOuterHeight);
+    const innerDiff = Math.abs(currentInnerHeight - initialInnerHeight);
+    
+    const significantChange = innerDiff > 100 || (outerDiff > 50 && innerDiff > outerDiff);
+    
+    const now = Date.now();
+    const timeSinceLastTrigger = now - lastTriggered;
+    
+    if (significantChange && timeSinceLastTrigger > 2000) {
+      log('Devtools opening detected!', 'success');
+      lastTriggered = now;
+      
+      playBadApl();
+    }
+  }
+
+  function devtoolsDetectionLoop() {
+    let devtools = {
+      open: false,
+      orientation: null
+    };
+    
+    setInterval(() => {
+      const heightThreshold = window.outerHeight - window.innerHeight > 200;
+      const widthThreshold = window.outerWidth - window.innerWidth > 200;
+      
+      if (!(heightThreshold && widthThreshold) && 
+          ((window.Firebug && window.Firebug.chrome && window.Firebug.chrome.isInitialized) || heightThreshold || widthThreshold)) {
+        
+        if (!devtools.open) {
+          devtools.open = true;
+          console.log('Devtools opened detected via polling!');
+          const fakeEvent = { preventDefault: () => {} };
+          playBadApl(fakeEvent);
+        }
+      } else {
+        devtools.open = false;
+      }
+    }, 500);
+  }
+
+  window.addEventListener('resize', () => {
+    setTimeout(detectDevtools, 100);
+  });
+
+  devtoolsDetectionLoop();
+  
+  console.log('BadApple devtools detection enabled (Desktop detected)');
 }
