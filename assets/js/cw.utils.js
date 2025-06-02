@@ -1,6 +1,6 @@
 //Cw.utils.js | Utility functions for classic window
 
-function cs(html) { //cs for convert styles, ik its not conversion but as (add styles) is proteged
+function cwStyles(html) { //cs for convert styles, ik its not conversion but as (add styles) is proteged
     return `
         <style>
             a {

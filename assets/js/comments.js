@@ -74,7 +74,7 @@ function displayComments(window, comments) {
         const userLiked = comment.user_reaction === 'like';
         const userDisliked = comment.user_reaction === 'dislike';
 
-        return cs(`
+        return cwStyles(`
         <div class="comment" data-id="${comment.id}">
             <bold>${comment.author || 'Anonymous'}</bold>
             <span>${formatDate(comment.date)}</span>
@@ -172,7 +172,7 @@ function spawnNewCommentForm() {
         height: 300,
         x: Math.round((window.innerWidth - 400) / 2),
         y: Math.round((window.innerHeight - 300) / 2),
-        content: cs(`
+        content: cwStyles(`
             <div>
                 <form>
                     <div>
