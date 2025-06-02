@@ -145,7 +145,7 @@ if (!isMobileDevice()) {
       open: false,
       orientation: null
     };
-    
+     
     setInterval(() => {
       const heightThreshold = window.outerHeight - window.innerHeight > 200;
       const widthThreshold = window.outerWidth - window.innerWidth > 200;

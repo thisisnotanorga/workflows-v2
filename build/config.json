@@ -43,6 +43,7 @@
     "creationDate",
     "country",
     "countryCode",
-    "notification"
+    "notification",
+    "userAgent"
   ]
 }
