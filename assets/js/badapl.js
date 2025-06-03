@@ -16,7 +16,7 @@ function isGoodAppleEnabled() {
 async function playBadApl() {
   if (isGoodAppleEnabled()) {
     log('Bad Apple playback skipped - Good Apple mode is enabled', 'warning');
-    log('write \'i hate badapple\' to enable bad apple.', 'info');
+    log('write \'i hate badapple\' to enable bad apple.', 'warning');
     return null;
   }
 
