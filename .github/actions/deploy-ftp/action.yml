@@ -39,18 +39,26 @@ runs:
         
         mkdir -p upload
         
+        # Copie tous les fichiers sauf les exclusions
         rsync -av \
           --exclude="api/config.php" \
-          --exclude="*.txt" \
           --exclude="*.md" \
           --exclude="*.log" \
+          --exclude="*.txt" \
           --include="changelog.txt" \
+          --include="api/comments/bw.txt" \
           "$BUILD_DIR/" upload/
         
         echo "[i] Files prepared for upload:"
         find upload -type f | head -20
         TOTAL_FILES=$(find upload -type f | wc -l)
         echo "[i] Total files to upload: $TOTAL_FILES"
+        
+        if [ -f "upload/changelog.txt" ]; then
+          echo "[OK] changelog.txt is included in upload"
+        else
+          echo "[!] WARNING: changelog.txt not found in upload directory"
+        fi
     
     - name: Create latest.zip archive
       shell: bash
@@ -62,9 +70,11 @@ runs:
         zip -r latest.zip . \
           -x "latest.zip"
         
+        echo "[i] Archive contents:"
+        unzip -l latest.zip | grep -E "(changelog\.txt|\.txt$)" || echo "[!] No .txt files found in archive"
+        
         ZIP_SIZE=$(du -sh latest.zip | cut -f1)
-        echo "[i] Created latest.zip in $BUILD_DIR (Size: $ZIP_SIZE)"
-      
+        echo "[i] Created latest.zip (Size: $ZIP_SIZE)"
     
     - name: Final upload summary
       shell: bash
@@ -90,10 +100,9 @@ runs:
         exclude: |
           **/.git*
           **/.git*/**
-          **/changelog.txt
-          **/*.txt
           **/*.md
           **/*.log
+          **/api/config.php
           ${{ inputs.exclude-patterns }}
     
     - name: Set deployment status
