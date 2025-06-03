@@ -1,5 +1,24 @@
 //Badapl.js | Logs bad apple in the dev console when devtools opens
+
+function toggleGoodApple() {
+  const currentSetting = localStorage.getItem('goodApple') === 'true';
+  const newSetting = !currentSetting;
+  localStorage.setItem('goodApple', newSetting.toString());
+  
+  log(`Good Apple mode ${newSetting ? 'enabled' : 'disabled'}. Bad Apple will ${newSetting ? 'NOT' : ''} play when devtools open.`, 'success');
+  return newSetting;
+}
+
+function isGoodAppleEnabled() {
+  return localStorage.getItem('goodApple') === 'true';
+}
+
 async function playBadApl() {
+  if (isGoodAppleEnabled()) {
+    log('Bad Apple playback skipped - Good Apple mode is enabled', 'warning');
+    log('write \'i hate badapple\' to enable bad apple.', 'info');
+    return null;
+  }
 
   try {
     const response = await fetch('assets/vids/ba.tmov');
@@ -96,7 +115,7 @@ async function playBadApl() {
     };
 
   } catch (error) {
-    console.error('Error playing badapl ascii: ' + error);
+    log('Error playing badapl ascii: ' + error, 'error');
     return null;
   }
 }
@@ -155,7 +174,7 @@ if (!isMobileDevice()) {
         
         if (!devtools.open) {
           devtools.open = true;
-          console.log('Devtools opened detected via polling!');
+          log('Devtools opened detected via polling!', 'success');
           const fakeEvent = { preventDefault: () => {} };
           playBadApl(fakeEvent);
         }
@@ -171,5 +190,6 @@ if (!isMobileDevice()) {
 
   devtoolsDetectionLoop();
   
-  console.log('BadApple devtools detection enabled (Desktop detected)');
+  log('BadApple devtools detection enabled (Desktop detected)', 'success');
+  log('write \'i hate badapple\' to disable bad apple.', 'warning');
 }

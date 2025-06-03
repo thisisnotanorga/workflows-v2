@@ -130,6 +130,10 @@ const sequences = {
     'cool': {
         action: spawnCool,
         description: 'shows a cool thing'
+    },
+    'i hate badapple': {
+        action: toggleGoodApple,
+        description: 'toggle badapple playback in devtools'
     }
 };
 
