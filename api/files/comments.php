@@ -80,17 +80,22 @@ function censorBadWords($text) {
         return $text;
     }
 
-    foreach ($badWords as $word) {
-        if (empty($word)) continue;
-
-        $pattern = '/\b' . preg_quote($word, '/') . '\b/i';
-        $replacement = str_repeat('#', strlen($word));
-
-        $text = preg_replace($pattern, $replacement, $text);
+    $words = preg_split('/\s+/', $text);
+    foreach ($words as &$word) {
+        foreach ($badWords as $badWord) {
+            if (strlen($badWord) > 4 && levenshtein($word, $badWord) <= 1) {
+                $word = str_repeat('#', strlen($word));
+                break;
+            } elseif ($word === $badWord) {
+                $word = str_repeat('#', strlen($word));
+                break;
+            }
+        }
     }
 
-    return $text;
+    return implode(' ', $words);
 }
+
 
 function getUserFingerprint() {
     $ip = $_SERVER['REMOTE_ADDR'];
