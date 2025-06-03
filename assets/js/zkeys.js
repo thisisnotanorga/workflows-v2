@@ -17,11 +17,6 @@ const keyBindings = [
         description: 'Show this message'
     },
     {
-        keys: ['Control', 'Shift', 'I'],
-        action: toggleHacker,
-        description: 'Are you hacking ?'
-    },
-    {
         keys: ['Shift', 'S'],
         action: showStats,
         description: 'Log the website stats in the console'
@@ -70,22 +65,6 @@ const sequences = {
     'awesome': {
         action: toggleAwesome,
         description: 'Toggle the awesome feature'
-    },
-    'ddos': {
-        action: toggleHacker,
-        description: 'Activate hacker mode'
-    },
-    'nmap': {
-        action: toggleHacker,
-        description: 'Activate hacker mode'
-    },
-    'botnet': {
-        action: toggleHacker,
-        description: 'Activate hacker mode'
-    },
-    'hack': {
-        action: toggleHacker,
-        description: 'Activate hacker mode'
     },
     'boom': {
         action: toggleBoom,

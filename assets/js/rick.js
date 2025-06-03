@@ -2,26 +2,28 @@
 
 let videoElement;
 
-function toggleRick() {
+function toggleRick(event) {
+    event.preventDefault();
+
     try {
         if (!videoElement) {
-        videoElement = document.createElement('video');
-        videoElement.src = "assets/vids/rick.mp4";
-        videoElement.loop = true;
-        videoElement.muted = true;
-        videoElement.autoplay = true;
-        videoElement.style.position = 'fixed';
-        videoElement.style.top = 0;
-        videoElement.style.left = 0;
-        videoElement.style.width = '100%';
-        videoElement.style.height = '100%';
-        videoElement.style.objectFit = 'cover';
-        videoElement.style.width = '100vw';
-        videoElement.style.height = '100vh';
-        videoElement.style.objectFit = 'cover';
-        videoElement.style.zIndex = -1;
+            videoElement = document.createElement('video');
+            videoElement.src = "assets/vids/rick.mp4";
+            videoElement.loop = true;
+            videoElement.muted = true;
+            videoElement.autoplay = true;
+            videoElement.style.position = 'fixed';
+            videoElement.style.top = 0;
+            videoElement.style.left = 0;
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
+            videoElement.style.objectFit = 'cover';
+            videoElement.style.width = '100vw';
+            videoElement.style.height = '100vh';
+            videoElement.style.objectFit = 'cover';
+            videoElement.style.zIndex = -1;
 
-        document.body.appendChild(videoElement);
+            document.body.appendChild(videoElement);
         } else {
             document.body.removeChild(videoElement);
             videoElement = null;
@@ -32,5 +34,9 @@ function toggleRick() {
         log(`Failed to toggle rick bg: ${err}`, 'error');
 
     }
-    
+
+}
+
+function coolFeature(event) { // just so we can rickroll someone with https://noskid.today/#coolFeature
+    toggleRick(event);
 }
