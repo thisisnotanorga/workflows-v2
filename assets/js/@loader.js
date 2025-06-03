@@ -44,7 +44,6 @@ class ScriptLoader {
             'assets/js/downfall.js',
             'assets/js/exploit.js',
             'assets/js/gary.js',
-            'assets/js/hacker.js',
             'assets/js/konata.js',
             'assets/js/localinfo.js',
             'assets/js/minecraft.js',
