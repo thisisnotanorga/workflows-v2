@@ -1,6 +1,6 @@
 *
 
-# dont ignore build files, but ignore the build subdirs!build/
+# dont ignore build files, but ignore the build subdirs !build/
 !build/
 !build/*
 build/*/
@@ -10,12 +10,14 @@ build/*/
 !assets/
 !assets/**
 !term/
+!term/**
 !index.html
 !maintenance.html
 !favicon.ico
 
 # API
 !api/
+!api/**/
 api/config.php
 !badges/
 
