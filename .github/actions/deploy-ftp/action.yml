@@ -39,14 +39,7 @@ runs:
         
         mkdir -p upload
         
-        # Copie tous les fichiers sauf les exclusions
         rsync -av \
-          --exclude="api/config.php" \
-          --exclude="*.md" \
-          --exclude="*.log" \
-          --exclude="*.txt" \
-          --include="changelog.txt" \
-          --include="api/comments/bw.txt" \
           "$BUILD_DIR/" upload/
         
         echo "[i] Files prepared for upload:"
