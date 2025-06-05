@@ -45,6 +45,8 @@
     "countryCode",
     "notification",
     "userAgent",
-    "devtools"
+    "devtools",
+    "total_requests",
+    "unique_views"
   ]
 }
