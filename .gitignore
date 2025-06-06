@@ -17,7 +17,8 @@ build/*/
 
 # API
 !api/
-!api/**/
+!api/**
+api/lastest/lastest.txt
 api/config.php
 !badges/
 
