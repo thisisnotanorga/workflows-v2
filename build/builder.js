@@ -26,9 +26,9 @@ function log(message, type = 'info') {
 
 function displayLogo() {
     console.log('\x1b[36m');
-    console.log('---------- NoSkid Builder ----------');
-    console.log('  A tool for optimizing noskid website');
-    console.log('Made by @philixy and @douxxtech');
+    console.log('----------- NoSkid Builder -----------');
+    console.log('|- A tool for optimizing noskid site |');
+    console.log('|-  Made by @philixy and @douxxtech  |');
     console.log('-------------------------------------');
     console.log('\x1b[0m');
     console.log();
@@ -215,8 +215,42 @@ class NoSkidBuilder {
                 log(`Copied directory: ${dir}`, 'success');
             }
         }
+
+        const errordocsDir = 'errordocs';
+        if (fs.existsSync(errordocsDir)) {
+            this.copyDir(errordocsDir, path.join(this.buildDir, errordocsDir));
+            this.processErrorDocs();
+            this.changeLog.assets.directories.push(errordocsDir);
+            log(`Copied and processed directory: ${errordocsDir}`, 'success');
+        }
     }
 
+    processErrorDocs() {
+        const errordocsDir = path.join(this.buildDir, 'errordocs');
+        if (!fs.existsSync(errordocsDir)) return;
+
+        const files = fs.readdirSync(errordocsDir);
+        for (const file of files) {
+            if (file.endsWith('.html')) {
+                const filePath = path.join(errordocsDir, file);
+                const originalContent = fs.readFileSync(filePath, 'utf8');
+                const optimized = this.minifyHTML(config.commentTag, originalContent);
+                fs.writeFileSync(filePath, optimized);
+
+                this.stats.htmlFilesOptimized++;
+                this.changeLog.htmlFiles.processed.push(`errordocs/${file}`);
+                this.changeLog.htmlFiles.optimized.push({
+                    filename: `errordocs/${file}`,
+                    originalSize: originalContent.length,
+                    optimizedSize: optimized.length,
+                    spaceSaved: originalContent.length - optimized.length,
+                    compressionRatio: ((originalContent.length - optimized.length) / originalContent.length * 100).toFixed(2)
+                });
+
+                log(`Optimized HTML file in errordocs: ${file}`, 'success');
+            }
+        }
+    }
 
     copyDir(src, dest) {
         if (!fs.existsSync(dest)) {
@@ -789,7 +823,6 @@ class NoSkidBuilder {
 
         log(`Change log written to: ${changeLogPath}`, 'success');
 
-
         log(`Build completed successfully in ${duration}s!`, 'success');
         log(`Output directory: ${this.buildDir}`, 'info');
 
@@ -804,7 +837,6 @@ class NoSkidBuilder {
         log(`Variables renamed: ${this.variableMap.size}`, 'info');
         log(`Space saved: ${spaceSaved} bytes (${compressionRatio}%)`, 'info');
     }
-
 
     writeChangeLog() {
         const changeLogPath = path.join(this.buildDir, 'changelog.txt');
