@@ -22,6 +22,10 @@ api/lastest/lastest.txt
 api/config.php
 !badges/
 
+#error docs
+!errordocs/
+!errordocs/**
+
 # misc
 !LICENSE
 !/README.md
