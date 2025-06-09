@@ -83,7 +83,7 @@ runs:
     
     - name: Deploy to server via FTP
       id: deploy
-      uses: SamKirkland/FTP-Deploy-Action@v4
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
       with:
         server: ${{ inputs.ftp-server }}
         username: ${{ inputs.ftp-username }}
