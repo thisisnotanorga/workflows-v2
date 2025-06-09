@@ -332,7 +332,7 @@ async function handleQuizDisplay() {
       const message = document.createElement('p');
       message.innerHTML = `❌ You have already taken this test.
       <br>
-      You can still add some <a href="https://github.com/douxxtech/noskid.today/blob/main/badges.md" target="_blank">noskid badges</a> to your projects or do the quiz again by typing 'bypass' !`;
+      You can still check the <a href="https://github.com/douxxtech/noskid.today/blob/main/noskid-services.md" target="_blank">noskid services</a> or do the quiz again by typing 'bypass' !`;
       message.className = 'quiz-message';
       quizForm.appendChild(message);
       submitButton.style.display = 'none';
@@ -368,39 +368,5 @@ async function redoQuiz(event) {
   quizForm.addEventListener('submit', (e) => {
     e.preventDefault();
     checkQuizResponses();
-  });
-}
-
-function spawnNoSkidInfoWindow() {
-  ClassicWindow.createWindow({
-    title: 'What Can You Do with a NoSkid Certificate?',
-    width: 450,
-    height: 320,
-    content: `
-      <div style="font-family: system-ui, sans-serif; color: #f1f1f1; background-color: #1e1e1e; padding: 16px; line-height: 1.6; font-size: 14px;">
-        <p style="margin-bottom: 1em;">Nice! You've got your <strong>NoSkid certificate</strong>. Here's what you can do next:</p>
-        
-        <ul style="list-style: none; padding-left: 0;">
-          <li style="margin-bottom: 0.8em;">
-            ✅ <strong>Customize it with skins</strong> → 
-            <a href="https://skins.noskid.today" target="_blank" style="color: #58a6ff;">skins.noskid.today</a>
-          </li>
-          <li style="margin-bottom: 0.8em;">
-            📬 <strong>Get a cool email</strong> → 
-            <a href="https://im.notaskid.ong" target="_blank" style="color: #58a6ff;">@is.notaskid.ong</a>
-          </li>
-          <li style="margin-bottom: 0.8em;">
-            🏅 <strong>Show off with badges</strong> → 
-            <a href="https://github.com/phlixy/noskid.today/blob/main/badges.md" target="_blank" style="color: #58a6ff;">see badge options</a>
-          </li>
-        </ul>
-
-        <hr style="border: 0; border-top: 1px solid #333; margin: 1.5em 0;">
-        
-        <p style="font-style: italic;">You're officially <strong>not a skid</strong>. Go flex it. 😎</p>
-      </div>
-    `,
-    theme: 'dark',
-    icon: 'assets/img/noskid-icon.png',
   });
 }
