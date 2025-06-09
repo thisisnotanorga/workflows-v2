@@ -257,6 +257,7 @@ function offerCertificate(percentage, userAnswers) {
   }
 
   downloadButton.addEventListener('click', async () => {
+    quizForm.removeEventListener('submit');
     const username = usernameInput.value.trim();
 
     if (!username) {
@@ -295,19 +296,7 @@ function offerCertificate(percentage, userAnswers) {
         quizForm.innerHTML = `
   <p>✅ Certificate downloaded! Check if a certificate is valid with 'Shift + C'</p>
   <br>
-  <button onclick="spawnNoSkidInfoWindow()" style="
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    background-color: #1e1e1e;
-    color: #ffffff;
-    border: 1px solid #444;
-    border-radius: 4px;
-    transition: background-color 0.2s, border-color 0.2s;
-  " onmouseover="this.style.backgroundColor='#2a2a2a'; this.style.borderColor='#666';"
-     onmouseout="this.style.backgroundColor='#1e1e1e'; this.style.borderColor='#444';">
-    📦 What can I do with the certificate?
-  </button>
+  <p>Check out what you can do with it: <a href="https://github.com/douxxtech/noskid.today/blob/main/noskid-services.md" target="_blank">noskid services</a></p>
   <hr>
   <p>If you like this website consider adding a star to 
     <a href="https://github.com/douxxtech/noskid.today" target="_blank">the GitHub</a> <3

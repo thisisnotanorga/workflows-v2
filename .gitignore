@@ -31,6 +31,7 @@ api/config.php
 !/README.md
 !/package.json
 !/badges.md
+!/noskid-services.md
 !/.gitignore
 !.github/
 !.github/**
