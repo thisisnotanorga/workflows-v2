@@ -11,18 +11,18 @@ async function loadQuestions() {
   try {
     const response = await fetch('/api/certificate');
     const data = await response.json();
-    
+
     if (!data.success) {
       throw new Error(data.message || 'Failed to load questions');
     }
-    
+
     quizQuestions = data.questions.map(q => ({
       question: q.question,
       options: q.answers.map(a => a.content),
       answer: q.answers.find((a, index) => index === (q.correct_answer_id - 1))?.content || q.answers[0].content,
       correct_answer_id: q.correct_answer_id
     }));
-    
+
     log('Questions loaded successfully!', 'success');
     return true;
   } catch (error) {
@@ -94,14 +94,14 @@ async function createQuestions() {
 }
 
 async function checkQuizResponses() {
-  
+
   const userAnswers = {};
   let allAnswered = true;
 
   quizQuestions.forEach((question, index) => {
     const questionId = index + 1;
     const selectedInput = quizForm.querySelector(`input[name="q${questionId}"]:checked`);
-    
+
     if (selectedInput) {
       userAnswers[questionId] = parseInt(selectedInput.value);
     } else {
@@ -117,7 +117,7 @@ async function checkQuizResponses() {
   try {
     const params = new URLSearchParams();
     params.append('action', 'check');
-    
+
     Object.keys(userAnswers).forEach(questionId => {
       params.append(questionId, userAnswers[questionId]);
     });
@@ -130,7 +130,7 @@ async function checkQuizResponses() {
     }
 
     displayQuizResults(data);
-    
+
     localStorage.setItem('quizTaken', 'true');
     log('quizTaken set to true', 'warning');
 
@@ -157,14 +157,14 @@ function displayQuizResults(results) {
     const selectedInput = quizForm.querySelector(`input[name="q${questionId}"][value="${userAnswerId}"]`);
     if (selectedInput) {
       const selectedLabel = selectedInput.closest('.radio-label');
-      
+
       if (detail.is_correct) {
         selectedLabel.classList.add('correct');
         log(`Question ${questionId}: Correct!`, 'success');
       } else {
         selectedLabel.classList.add('incorrect');
         log(`Question ${questionId}: Incorrect!`, 'warning');
-        
+
         const correctInput = quizForm.querySelector(`input[name="q${questionId}"][value="${correctAnswerId}"]`);
         if (correctInput) {
           const correctLabel = correctInput.closest('.radio-label');
@@ -258,7 +258,7 @@ function offerCertificate(percentage, userAnswers) {
 
   downloadButton.addEventListener('click', async () => {
     const username = usernameInput.value.trim();
-    
+
     if (!username) {
       alert('Please enter a valid name.');
       return;
@@ -273,11 +273,11 @@ function offerCertificate(percentage, userAnswers) {
       const params = new URLSearchParams();
       params.append('action', 'download');
       params.append('name', username);
-      
+
       Object.keys(userAnswers).forEach(questionId => {
         params.append(questionId, userAnswers[questionId]);
       });
-      
+
       if (turnstileToken) {
         params.append('turnstile_token', turnstileToken);
       }
@@ -288,23 +288,40 @@ function offerCertificate(percentage, userAnswers) {
       downloadButton.textContent = 'Downloading...';
 
       window.location.href = downloadUrl;
-      
+
       log('Certificate download initiated!', 'success');
-      
+
       setTimeout(() => {
-        quizForm.innerHTML = `<p>✅ Certificate downloaded! Check if a certificate is valid with 'Shift + C'</p>
-            <br>
-            <p>Show your hard work on your projects with the <a href="https://github.com/douxxtech/noskid.today/blob/main/badges.md" target="_blank">noskid badges</a> :]
-            <p>You may also like getting a <a href="https://im.notaskid.ong" target="_blank">@is.notaskid.ong email</a> ?</p>
-            <hr>
-            <p>If you like this website consider adding a star to <a href="https://github.com/douxxtech/noskid.today" target="_blank">the github</a> <3</p>`;
+        quizForm.innerHTML = `
+  <p>✅ Certificate downloaded! Check if a certificate is valid with 'Shift + C'</p>
+  <br>
+  <button onclick="spawnNoSkidInfoWindow()" style="
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #1e1e1e;
+    color: #ffffff;
+    border: 1px solid #444;
+    border-radius: 4px;
+    transition: background-color 0.2s, border-color 0.2s;
+  " onmouseover="this.style.backgroundColor='#2a2a2a'; this.style.borderColor='#666';"
+     onmouseout="this.style.backgroundColor='#1e1e1e'; this.style.borderColor='#444';">
+    📦 What can I do with the certificate?
+  </button>
+  <hr>
+  <p>If you like this website consider adding a star to 
+    <a href="https://github.com/douxxtech/noskid.today" target="_blank">the GitHub</a> <3
+  </p>
+`;
+
+
         certificateSection.style.display = 'none';
       }, 2000);
-      
+
     } catch (error) {
       log('Error downloading certificate: ' + error.message, 'error');
       alert('Error downloading certificate. Please try again.');
-      
+
       downloadButton.disabled = false;
       downloadButton.textContent = 'Download';
     }
@@ -362,5 +379,39 @@ async function redoQuiz(event) {
   quizForm.addEventListener('submit', (e) => {
     e.preventDefault();
     checkQuizResponses();
+  });
+}
+
+function spawnNoSkidInfoWindow() {
+  ClassicWindow.createWindow({
+    title: 'What Can You Do with a NoSkid Certificate?',
+    width: 450,
+    height: 320,
+    content: `
+      <div style="font-family: system-ui, sans-serif; color: #f1f1f1; background-color: #1e1e1e; padding: 16px; line-height: 1.6; font-size: 14px;">
+        <p style="margin-bottom: 1em;">Nice! You've got your <strong>NoSkid certificate</strong>. Here's what you can do next:</p>
+        
+        <ul style="list-style: none; padding-left: 0;">
+          <li style="margin-bottom: 0.8em;">
+            ✅ <strong>Customize it with skins</strong> → 
+            <a href="https://skins.noskid.today" target="_blank" style="color: #58a6ff;">skins.noskid.today</a>
+          </li>
+          <li style="margin-bottom: 0.8em;">
+            📬 <strong>Get a cool email</strong> → 
+            <a href="https://im.notaskid.ong" target="_blank" style="color: #58a6ff;">@is.notaskid.ong</a>
+          </li>
+          <li style="margin-bottom: 0.8em;">
+            🏅 <strong>Show off with badges</strong> → 
+            <a href="https://github.com/phlixy/noskid.today/blob/main/badges.md" target="_blank" style="color: #58a6ff;">see badge options</a>
+          </li>
+        </ul>
+
+        <hr style="border: 0; border-top: 1px solid #333; margin: 1.5em 0;">
+        
+        <p style="font-style: italic;">You're officially <strong>not a skid</strong>. Go flex it. 😎</p>
+      </div>
+    `,
+    theme: 'dark',
+    icon: 'assets/img/noskid-icon.png',
   });
 }
