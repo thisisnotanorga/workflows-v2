@@ -257,7 +257,6 @@ function offerCertificate(percentage, userAnswers) {
   }
 
   downloadButton.addEventListener('click', async () => {
-    quizForm.removeEventListener('submit');
     const username = usernameInput.value.trim();
 
     if (!username) {
