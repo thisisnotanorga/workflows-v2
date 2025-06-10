@@ -14,7 +14,7 @@ env:
 jobs:
   analyze-changes:
     name: Analyze Changes
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     outputs:
       api-only: ${{ steps.check.outputs.api-only }}
       has-frontend: ${{ steps.check.outputs.has-frontend }}
